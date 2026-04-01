@@ -1,0 +1,1832 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Herramientas de Datos - Apuntes Completos</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2333;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-secondary: #8b949e;
+    --accent: #58a6ff;
+    --accent2: #3fb950;
+    --accent3: #d2a8ff;
+    --accent4: #f0883e;
+    --accent5: #f778ba;
+    --red: #ff7b72;
+    --yellow: #e3b341;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 0;
+  }
+
+  /* ── NAV LATERAL ── */
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: 280px;
+    height: 100vh;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    padding: 20px 16px;
+    z-index: 100;
+    transition: transform 0.3s;
+  }
+  .sidebar h2 {
+    color: var(--accent);
+    font-size: 1rem;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar a {
+    display: block;
+    color: var(--text-secondary);
+    text-decoration: none;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    margin-bottom: 2px;
+    transition: all 0.2s;
+  }
+  .sidebar a:hover {
+    color: var(--accent);
+    background: rgba(88,166,255,0.1);
+  }
+  .sidebar .nav-section {
+    color: var(--accent3);
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 14px;
+    margin-bottom: 6px;
+    padding-left: 8px;
+  }
+  .main {
+    margin-left: 280px;
+    padding: 40px 48px 80px;
+    max-width: 1000px;
+  }
+
+  /* ── TOGGLE NAV MOBILE ── */
+  .nav-toggle {
+    display: none;
+    position: fixed;
+    top: 12px; left: 12px;
+    z-index: 200;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+  @media (max-width: 800px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); }
+    .nav-toggle { display: block; }
+    .main { margin-left: 0; padding: 60px 20px 80px; }
+  }
+
+  /* ── TITULOS ── */
+  h1 {
+    font-size: 2.4rem;
+    background: linear-gradient(135deg, var(--accent), var(--accent3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+  .subtitle {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    margin-bottom: 40px;
+  }
+  h2 {
+    font-size: 1.6rem;
+    color: var(--accent);
+    margin-top: 56px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--border);
+  }
+  h3 {
+    font-size: 1.2rem;
+    color: var(--accent2);
+    margin-top: 32px;
+    margin-bottom: 8px;
+  }
+  h4 {
+    font-size: 1rem;
+    color: var(--accent4);
+    margin-top: 20px;
+    margin-bottom: 6px;
+  }
+  p { margin-bottom: 12px; }
+
+  /* ── CODE BLOCKS ── */
+  pre {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    overflow-x: auto;
+    margin: 12px 0 20px;
+    position: relative;
+    font-size: 0.88rem;
+    line-height: 1.6;
+  }
+  code {
+    font-family: 'Fira Code', 'JetBrains Mono', 'Cascadia Code', Consolas, monospace;
+    font-size: 0.88rem;
+  }
+  pre code { color: var(--text); }
+  :not(pre) > code {
+    background: var(--surface2);
+    padding: 2px 7px;
+    border-radius: 4px;
+    color: var(--accent);
+    font-size: 0.85rem;
+  }
+
+  /* ── BOTON COPIAR ── */
+  .copy-btn {
+    position: absolute;
+    top: 8px; right: 8px;
+    background: var(--border);
+    color: var(--text-secondary);
+    border: none;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    opacity: 0;
+    transition: all 0.2s;
+  }
+  pre:hover .copy-btn { opacity: 1; }
+  .copy-btn:hover { background: var(--accent); color: #fff; }
+  .copy-btn.copied { background: var(--accent2); color: #fff; opacity: 1; }
+
+  /* ── TABLAS ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 20px;
+    font-size: 0.9rem;
+  }
+  th {
+    background: var(--surface2);
+    color: var(--accent);
+    text-align: left;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+  }
+  td {
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  tr:nth-child(even) td { background: rgba(22,27,34,0.5); }
+
+  /* ── CARDS / TIPS ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 16px 0;
+  }
+  .tip {
+    border-left: 4px solid var(--accent2);
+    background: rgba(63,185,80,0.06);
+    padding: 14px 20px;
+    border-radius: 0 8px 8px 0;
+    margin: 14px 0;
+  }
+  .tip::before {
+    content: "Tip";
+    color: var(--accent2);
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .warning {
+    border-left: 4px solid var(--yellow);
+    background: rgba(227,179,65,0.06);
+    padding: 14px 20px;
+    border-radius: 0 8px 8px 0;
+    margin: 14px 0;
+  }
+  .warning::before {
+    content: "Importante";
+    color: var(--yellow);
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .colab-badge {
+    display: inline-block;
+    background: var(--accent4);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 12px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+
+  /* ── LISTAS ── */
+  ul, ol { margin: 8px 0 16px 24px; }
+  li { margin-bottom: 4px; }
+
+  /* ── SEARCH ── */
+  .search-box {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.85rem;
+    margin-bottom: 12px;
+    outline: none;
+  }
+  .search-box:focus { border-color: var(--accent); }
+
+  /* ── SCROLL TOP ── */
+  .scroll-top {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 44px; height: 44px;
+    font-size: 1.4rem;
+    cursor: pointer;
+    display: none;
+    z-index: 50;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  }
+
+  /* ── SECTION BADGES ── */
+  .semana-badge {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .s1 { background: rgba(88,166,255,0.15); color: var(--accent); }
+  .s2 { background: rgba(63,185,80,0.15); color: var(--accent2); }
+  .s3 { background: rgba(210,168,255,0.15); color: var(--accent3); }
+  .s4 { background: rgba(240,136,62,0.15); color: var(--accent4); }
+
+  .separator { height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent3), var(--accent4)); border-radius: 2px; margin: 56px 0 40px; }
+
+  /* Print styles */
+  @media print {
+    .sidebar, .nav-toggle, .copy-btn, .scroll-top { display: none !important; }
+    .main { margin-left: 0; }
+    body { background: #fff; color: #000; }
+    pre { border: 1px solid #ccc; }
+  }
+</style>
+</head>
+<body>
+
+<button class="nav-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">&#9776;</button>
+
+<!-- ═══════════ SIDEBAR ═══════════ -->
+<nav class="sidebar">
+  <h2>Herramientas de Datos</h2>
+  <input type="text" class="search-box" placeholder="Buscar tema..." oninput="filterNav(this.value)">
+
+  <div class="nav-section">Semana 1 - Python Base</div>
+  <a href="#s1-interfaz">Interfaz de Colab</a>
+  <a href="#s1-cookiecutter">Cookiecutter</a>
+  <a href="#s1-tipos">Tipos de datos</a>
+  <a href="#s1-colecciones">Listas, Sets, Tuplas, Dicts</a>
+  <a href="#s1-condicionales">Condicionales y Repeticiones</a>
+  <a href="#s1-funciones">Funciones</a>
+  <a href="#s1-errores">Manejo de errores</a>
+  <a href="#s1-objetos">Clases y Objetos</a>
+  <a href="#s1-extras">Extras Colab</a>
+
+  <div class="nav-section">Semana 2 - Archivos</div>
+  <a href="#s2-txt">Archivo TXT</a>
+  <a href="#s2-ini">Archivo INI</a>
+  <a href="#s2-yaml">Archivo YAML</a>
+  <a href="#s2-xml">Archivo XML</a>
+  <a href="#s2-csv">Archivo CSV</a>
+  <a href="#s2-json">Archivo JSON</a>
+
+  <div class="nav-section">Semana 3 - NumPy & Matplotlib</div>
+  <a href="#s3-numpy">NumPy</a>
+  <a href="#s3-matplotlib">Matplotlib</a>
+  <a href="#s3-kaggle">Kaggle y Datasets</a>
+
+  <div class="nav-section">Semana 4 - Pandas & Regex</div>
+  <a href="#s4-pandas">Pandas</a>
+  <a href="#s4-regex">Expresiones Regulares</a>
+
+  <div class="nav-section">Referencias</div>
+  <a href="#ref-cheatsheet">Cheatsheet Rapido</a>
+  <a href="#ref-colab">Formato Colab</a>
+</nav>
+
+<!-- ═══════════ CONTENIDO PRINCIPAL ═══════════ -->
+<div class="main">
+
+<h1>Herramientas de Datos</h1>
+<p class="subtitle">Apuntes completos &mdash; Semanas 1 a 4 &mdash; Python, Archivos, NumPy, Matplotlib, Pandas, Regex</p>
+
+<!-- ╔═══════════════════════════════════════════╗ -->
+<!-- ║         SEMANA 1 - PYTHON BASE            ║ -->
+<!-- ╚═══════════════════════════════════════════╝ -->
+<div class="separator"></div>
+<span class="semana-badge s1">SEMANA 1</span>
+
+<!-- ── INTERFAZ ── -->
+<h2 id="s1-interfaz">Interfaz de Google Colab</h2>
+
+<p>Google Colab es un entorno de notebooks basado en Jupyter que permite escribir y ejecutar Python en el navegador con acceso a GPUs gratuitas.</p>
+
+<h3>Markdown en Colab</h3>
+<p>Las celdas de texto usan Markdown para formato:</p>
+
+<pre><code># Titulo 1
+## Titulo 2
+### Titulo 3
+
+**negrita**   __negrita__
+*cursiva*     _cursiva_
+***negrita y cursiva***
+
+`texto resaltado`
+[Google](https://www.google.com)
+
+> Cita o sangria
+
+1. Elemento numerado
+* Elemento con viñeta
+
+| Columna 1 | Columna 2 |
+| --- | --- |
+| F1C1 | F1C2 |
+
+---   &lt;!-- Linea horizontal --&gt;</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Montar Google Drive</h3>
+<pre><code>from google.colab import drive
+drive.mount('/content/drive')</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Secrets (API Keys)</h3>
+<pre><code>from google.colab import userdata
+print(userdata.get('api_key'))</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Formularios en Colab <span class="colab-badge">Colab</span></h3>
+<pre><code>#@title # Carga de Datos
+#@markdown # Formulario para la Carga de Datos
+#@markdown ---
+
+raw_ = "vacio"    #@param {type: "raw"}
+str_ = "str"      #@param {type: "string"}
+int_ = 10         #@param {type: "integer"}
+float_ = 10.5     #@param {type: "number"}
+bool_ = True      #@param {type: "boolean"}
+date_ = "1990-01-29" #@param {type: "date"}
+
+#@markdown ---
+slider = 40       #@param {type: "slider", min: 10, max: 50}
+dropdown = "1"    #@param ["1", "2", "3", "4"]
+dropdown_input = "5" #@param ["1", "2", "3", "4"] {allow-input: true}</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Diferencia entre <code>!</code> y <code>%</code></h3>
+<div class="card">
+  <p><code>!</code> &mdash; Ejecuta un comando en un <strong>sub-shell</strong>. No cambia el estado del notebook.</p>
+  <p><code>%</code> &mdash; Son <strong>magic commands</strong> de IPython. Cambian el estado (ej: <code>%cd</code> cambia el directorio del notebook).</p>
+</div>
+
+<pre><code>!pwd          # muestra directorio (sub-shell)
+!cd /tmp      # NO cambia directorio del notebook
+
+%cd /tmp      # SI cambia directorio del notebook
+%ls           # lista archivos</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Crear directorios y descargar archivos</h3>
+<pre><code>import os
+os.makedirs("/content/drive/MyDrive/Test", exist_ok=True)
+
+# Escribir un archivo
+with open("/content/drive/MyDrive/Test/holamundo.txt", 'w') as w:
+    w.write("Hola Mundo!!!!")
+
+# Leer un archivo
+with open("/content/drive/MyDrive/Test/holamundo.txt") as r:
+    print(r.read())
+
+# Descargar un archivo desde internet
+!wget -O /content/drive/MyDrive/python/ejemplo.py https://filesamples.com/samples/code/py/sample3.py
+
+# Desmontar Drive
+drive.flush_and_unmount()</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<!-- ── COOKIECUTTER ── -->
+<h2 id="s1-cookiecutter">Cookiecutter - Estructura de Proyecto</h2>
+
+<p>Cookiecutter genera estructura de proyectos a partir de templates. El template de <strong>data science</strong> genera:</p>
+
+<pre><code>!pip install cookiecutter
+!cookiecutter https://github.com/drivendata/cookiecutter-data-science -v</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<div class="card">
+  <h4>Estructura generada:</h4>
+<pre><code>proyecto/
+├── data/
+│   ├── external/      # Datos de terceros
+│   ├── interim/       # Datos intermedios transformados
+│   ├── processed/     # Datos finales para modelos
+│   └── raw/           # Datos originales e inmutables
+├── docs/              # Documentacion
+├── models/            # Modelos entrenados
+├── notebooks/         # Jupyter notebooks
+├── references/        # Manuales y material explicativo
+├── reports/
+│   └── figures/       # Graficos generados
+├── src/
+│   ├── data/          # Scripts para descargar/generar datos
+│   ├── features/      # Scripts para crear features
+│   ├── models/        # Scripts para entrenar y predecir
+│   └── visualization/ # Scripts para visualizaciones
+├── Makefile
+├── README.md
+├── requirements.txt
+├── setup.py
+└── tox.ini</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+</div>
+
+<!-- ── TIPOS DE DATOS ── -->
+<h2 id="s1-tipos">Tipos de Datos en Python</h2>
+
+<h3>str (Cadenas de texto)</h3>
+<pre><code>str_ = "Hola mundo!"
+print(f"str_: {str_} - tipo: {type(str_)}")
+
+a = " hola "
+b = "MUNDo! "
+
+# Concatenacion
+c = a + b                    # concatenacion directa
+c = "%s%s" % (a, b)         # formato %
+c = "{}{}".format(a, b)     # format()
+c = f"{a}{b}"               # f-string (recomendado)</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h4>Metodos de string</h4>
+<table>
+  <tr><th>Metodo</th><th>Descripcion</th><th>Ejemplo</th></tr>
+  <tr><td><code>.lower()</code></td><td>Convierte a minusculas</td><td><code>"ABC".lower()</code> &rarr; <code>"abc"</code></td></tr>
+  <tr><td><code>.upper()</code></td><td>Convierte a mayusculas</td><td><code>"abc".upper()</code> &rarr; <code>"ABC"</code></td></tr>
+  <tr><td><code>.capitalize()</code></td><td>Primera letra mayuscula</td><td><code>"hola".capitalize()</code> &rarr; <code>"Hola"</code></td></tr>
+  <tr><td><code>.startswith(x)</code></td><td>Empieza con x?</td><td><code>"hola".startswith("ho")</code> &rarr; <code>True</code></td></tr>
+  <tr><td><code>.endswith(x)</code></td><td>Termina con x?</td><td><code>"hola".endswith("la")</code> &rarr; <code>True</code></td></tr>
+  <tr><td><code>.strip()</code></td><td>Elimina espacios a ambos lados</td><td><code>" hi ".strip()</code> &rarr; <code>"hi"</code></td></tr>
+  <tr><td><code>.lstrip()</code></td><td>Elimina espacios a la izquierda</td><td></td></tr>
+  <tr><td><code>.rstrip()</code></td><td>Elimina espacios a la derecha</td><td></td></tr>
+  <tr><td><code>.split(x)</code></td><td>Divide por caracter x</td><td><code>"a-b".split("-")</code> &rarr; <code>["a","b"]</code></td></tr>
+</table>
+
+<h3>bool (Booleanos)</h3>
+<pre><code>bool_ = True   # o False
+
+# Operadores logicos
+not True        # False
+True and False  # False
+True or False   # True</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h4>Tablas de verdad</h4>
+<table>
+  <tr><th>A</th><th>B</th><th>A and B</th><th>A or B</th><th>not A</th></tr>
+  <tr><td>True</td><td>True</td><td>True</td><td>True</td><td>False</td></tr>
+  <tr><td>True</td><td>False</td><td>False</td><td>True</td><td>False</td></tr>
+  <tr><td>False</td><td>True</td><td>False</td><td>True</td><td>True</td></tr>
+  <tr><td>False</td><td>False</td><td>False</td><td>False</td><td>True</td></tr>
+</table>
+
+<h3>int / float (Numeros)</h3>
+<pre><code>int_  = 10      # tipo: int
+float_ = 10.5   # tipo: float
+
+a, b = 5, 2
+a + b    # 7    suma
+a - b    # 3    resta
+a * b    # 10   multiplicacion
+a / b    # 2.5  division
+a // b   # 2    division entera
+a ** b   # 25   potencia
+a % b    # 1    modulo (resto)</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>date y datetime</h3>
+<pre><code>from datetime import date, datetime, timedelta
+
+date_ = date(1990, 1, 1)
+datetime_ = datetime(1990, 1, 1, 2, 55, 36)
+
+# Formatear a string (strftime)
+datetime_.strftime("%d/%m/%Y %H:%M:%S")  # "01/01/1990 02:55:36"
+
+# Parsear desde string (strptime)
+datetime.strptime("01/01/1990 02:55:36", "%d/%m/%Y %H:%M:%S")
+
+# Sumar / restar dias
+datetime_ + timedelta(days=10)
+datetime_ - timedelta(days=10)</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<!-- ── COLECCIONES ── -->
+<h2 id="s1-colecciones">Listas, Sets, Tuplas y Diccionarios</h2>
+
+<h3>Lista <code>list</code> &mdash; ordenada, mutable, permite duplicados</h3>
+<pre><code>list_ = [1, 2, 3, 4]
+
+list_.append(5)           # agrega al final: [1,2,3,4,5]
+list_.insert(0, 0)        # inserta en posicion 0: [0,1,2,3,4,5]
+list_.extend([6, 7])      # agrega multiples: [0,1,2,3,4,5,6,7]
+list_.count(7)            # cuenta ocurrencias de 7
+list_.index(5)            # posicion de 5
+list_.remove(6)           # elimina primera ocurrencia de 6
+valor = list_.pop()       # elimina y retorna el ultimo
+len(list_)                # longitud
+list_.clear()             # vacia la lista</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Set <code>set</code> &mdash; NO ordenado, mutable, SIN duplicados</h3>
+<pre><code>set_ = {1, 2, 3, 4, 3, 4, 5}  # {1, 2, 3, 4, 5}
+
+set_.add(6)               # agrega elemento
+set_.update({1, 2, 7})    # agrega multiples
+set_.remove(6)            # elimina (error si no existe)
+valor = set_.pop()        # elimina y retorna uno aleatorio
+len(set_)                 # longitud
+set_.clear()              # vacia el set</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Tupla <code>tuple</code> &mdash; ordenada, INMUTABLE, permite duplicados</h3>
+<pre><code>tuple_ = (1, 2, 3, 1)
+
+tuple_.index(1)           # posicion de 1 -> 0
+tuple_.count(1)           # cuenta ocurrencias -> 2
+len(tuple_)               # longitud -> 4
+tuple_[2]                 # acceso por indice -> 3</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Diccionario <code>dict</code> &mdash; clave-valor, mutable</h3>
+<pre><code>dict_ = {"1": "a", "2": "b", "3": "c"}
+
+dict_["4"] = "d"                    # agregar/modificar
+dict_.update({"4": "df", "5": "f"}) # actualizar multiples
+dict_.pop("5")                      # eliminar y retornar
+list(dict_.keys())                  # lista de claves
+list(dict_.values())                # lista de valores
+
+for key, value in dict_.items():    # iterar
+    print(f"key: {key} - value: {value}")
+
+len(dict_)                          # longitud
+dict_.clear()                       # vaciar</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<!-- ── CONDICIONALES ── -->
+<h2 id="s1-condicionales">Condicionales y Repeticiones</h2>
+
+<h3>if / elif / else</h3>
+<pre><code># Simple
+if condicion:
+    print("Verdadero")
+else:
+    print("Falso")
+
+# Multiple
+if condicion_1:
+    ...
+elif condicion_2:
+    ...
+elif condicion_3:
+    ...
+else:
+    ...
+
+# Asignacion en linea (ternario)
+resultado = valor_1 if condicion else valor_2
+
+# Operadores: in / not in
+1 in [2, 3, 4, 5]         # False
+1 not in {2, 3, 4, 5}     # True</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>match/case (Python 3.10+)</h3>
+<pre><code>tipo_cuenta = 'caja ahorro pesos'
+match tipo_cuenta:
+    case 'cuenta corriente pesos':
+        print("Cuenta corriente pesos")
+    case 'caja de ahorro pesos':
+        print("Caja de ahorro pesos")
+    case _:
+        print("Tipo desconocido")</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>for</h3>
+<pre><code># Iterar sobre claves de un diccionario
+for clave in dict_.keys():
+    print(clave)
+
+# Iterar clave-valor
+for clave, valor in dict_.items():
+    print(f"{clave}: {valor}")
+
+# zip - unir listas
+for clave, valor in zip(lista_claves, lista_valores):
+    print(f"{clave}: {valor}")
+
+# enumerate - iterar con posicion
+for posicion, valor in enumerate(lista):
+    print(f"{posicion}: {valor}")</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>while</h3>
+<pre><code># Con condicion
+posicion = 0
+while posicion != longitud:
+    print(lista[posicion])
+    posicion += 1
+
+# Con break
+while True:
+    print(lista[posicion])
+    posicion += 1
+    if posicion == longitud:
+        break
+
+# continue = salta a la siguiente iteracion</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Comprension de listas (list comprehension)</h3>
+<pre><code># Basica
+cuadrados = [x**2 for x in range(5)]        # [0,1,4,9,16]
+
+# Con filtro
+pares = [x**2 for x in range(5) if x % 2 == 0]  # [0,4,16]
+
+# Con if-else
+resultado = [x**2 if x % 2 == 0 else -1 for x in range(5)]  # [0,-1,4,-1,16]
+
+# Dict comprehension
+invertido = {v: k for k, v in dict_.items()}</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<!-- ── FUNCIONES ── -->
+<h2 id="s1-funciones">Funciones y Procedimientos</h2>
+
+<div class="card">
+  <p><strong>Procedimiento</strong>: NO retorna valores (sin <code>return</code>).</p>
+  <p><strong>Funcion</strong>: Retorna 1 valor (con <code>return</code>).</p>
+</div>
+
+<pre><code># Procedimiento
+def suma_procedimiento(valor_1: float, valor_2: float):
+    """Procedimiento que muestra la suma de 2 valores."""
+    print(f"resultado: {valor_1 + valor_2}")
+
+# Funcion
+def suma_funcion(valor_1: float, valor_2: float) -> float:
+    """Funcion que retorna la suma de 2 valores."""
+    return valor_1 + valor_2
+
+# Uso
+suma_procedimiento(valor_1=10, valor_2=5)
+resultado = suma_funcion(10, 5)</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<!-- ── ERRORES ── -->
+<h2 id="s1-errores">Manejo de Errores</h2>
+
+<pre><code>try:
+    # Sentencias que pueden fallar
+    muestra = "valor: " + 1  # TypeError!
+except TypeError as e:
+    # Se ejecuta si hay un TypeError
+    print("Error de tipo:", e)
+    muestra = "valor: " + str(1)
+finally:
+    # Se ejecuta SIEMPRE (haya o no error)
+    print("Finalizado")
+
+# pass = no hacer nada en el except
+
+# raise = lanzar excepcion manualmente
+if isinstance(valor, int):
+    raise TypeError(100, "El valor no puede ser entero.")</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<!-- ── OBJETOS ── -->
+<h2 id="s1-objetos">Clases y Objetos (POO)</h2>
+
+<pre><code>class Persona:
+    def __init__(self, nombre: str, apellido: str, edad: int):
+        self.nombre = nombre
+        self.apellido = apellido
+        self.edad = edad
+
+    def __str__(self) -> str:
+        return f"Nombre: {self.nombre} {self.apellido}\nEdad: {self.edad}"
+
+persona = Persona(nombre="Pepe", apellido="Grillo", edad=19)
+print(persona)
+persona.edad = 21  # modificar atributo</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Herencia</h3>
+<pre><code>class Estudiante(Persona):
+    def __init__(self, nombre, apellido, edad, universidad: str):
+        super().__init__(nombre=nombre, apellido=apellido, edad=edad)
+        self.universidad = universidad
+
+    def __str__(self) -> str:
+        return super().__str__() + f"\nUniversidad: {self.universidad}"
+
+estudiante = Estudiante("Pepe", "Grillo", 19, "UGR")</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Atributos privados</h3>
+<pre><code>from typing import Union
+from datetime import datetime
+
+class Licenciado(Estudiante):
+    anio_egreso: Union[int, None] = None
+    __hora_creacion: datetime = datetime.now()  # privado (name mangling)
+
+    def obtener_hora_creacion(self) -> datetime:
+        return self.__hora_creacion
+
+lic = Licenciado("Pepe", "Grillo", 19, "UGR")
+lic.obtener_hora_creacion()      # OK
+# lic.__hora_creacion            # Error! Atributo privado
+
+# Ver propiedades del objeto
+list(lic.__dict__.keys())
+
+# Agregar atributo dinamicamente
+lic.promedio = 8.95
+
+# Eliminar atributo
+del lic.anio_egreso</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<!-- ── EXTRAS ── -->
+<h2 id="s1-extras">Extras de Colab</h2>
+
+<h3>Evitar desconexion del Colab <span class="colab-badge">Colab</span></h3>
+<pre><code>// Pegar en la consola del navegador (F12):
+function KeepClicking(){
+  console.log("Clicking");
+  document.querySelector("colab-connect-button").click()
+}
+setInterval(KeepClicking, 60000);</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Usar un modulo propio desde Drive</h3>
+<pre><code>import sys
+sys.path.insert(0, "/content/drive/MyDrive/python")
+from utils import my_print</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Medir tiempo de ejecucion</h3>
+<pre><code>%time print("Hola MUNDO!")
+# CPU times: user ... sys ...
+# Wall time: tiempo total incluyendo I/O</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Variables globales</h3>
+<pre><code>variable_global = 1
+
+def mi_funcion():
+    global variable_global
+    variable_global = 2
+
+mi_funcion()
+print(variable_global)  # 2</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Instalar librerias</h3>
+<pre><code># Desde PyPI
+!pip install tabulate
+
+# Desde GitHub
+!pip install git+https://github.com/user/repo.git</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Mostrar tablas</h3>
+<pre><code>from tabulate import tabulate
+table = [["Sun", 696000, 1989100000], ["Earth", 6371, 5973.6]]
+print(tabulate(table))
+
+# Con pandas
+%load_ext google.colab.data_table
+import pandas as pd
+df = pd.read_csv("./sample_data/mnist_test.csv")
+df  # se muestra como tabla interactiva</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+
+<!-- ╔═══════════════════════════════════════════╗ -->
+<!-- ║         SEMANA 2 - ARCHIVOS               ║ -->
+<!-- ╚═══════════════════════════════════════════╝ -->
+<div class="separator"></div>
+<span class="semana-badge s2">SEMANA 2</span>
+
+<h2 id="s2-txt">Archivo TXT</h2>
+
+<p>Archivo de texto plano sin formato especial. Tambien conocidos como archivos planos o ASCII.</p>
+
+<h3>Modos de apertura (open)</h3>
+<table>
+  <tr><th>Modo</th><th>Descripcion</th><th>Default</th></tr>
+  <tr><td><code>'r'</code></td><td>Solo lectura</td><td>SI</td></tr>
+  <tr><td><code>'w'</code></td><td>Escritura (trunca/borra contenido)</td><td></td></tr>
+  <tr><td><code>'x'</code></td><td>Escritura (falla si ya existe)</td><td></td></tr>
+  <tr><td><code>'a'</code></td><td>Escritura (agrega al final)</td><td></td></tr>
+  <tr><td><code>'b'</code></td><td>Modo binario</td><td></td></tr>
+  <tr><td><code>'t'</code></td><td>Modo texto</td><td>SI</td></tr>
+  <tr><td><code>'+'</code></td><td>Para modificaciones</td><td></td></tr>
+</table>
+
+<pre><code># ESCRITURA
+def escribir_archivo(archivo: str):
+    with open(archivo, 'w') as w:
+        w.write("Lorem ipsum dolor sit amet...")
+
+# LECTURA
+def leer_archivo(archivo: str):
+    with open(archivo) as r:
+        print(r.read())
+
+# Alternativa sin with (NO recomendada)
+descriptor = open(archivo, mode="rt")
+try:
+    print(descriptor.read())
+finally:
+    descriptor.close()</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<div class="tip">
+  Siempre usa <code>with</code> para archivos. Python cierra el archivo automaticamente al salir del bloque, incluso si hay errores.
+</div>
+
+<!-- ── INI ── -->
+<h2 id="s2-ini">Archivo INI</h2>
+<p>Archivo de configuracion con secciones entre corchetes y pares nombre=valor.</p>
+
+<pre><code>from configparser import ConfigParser
+
+# ESCRITURA
+def escribir_archivo(archivo: str):
+    datos = {
+        "pais_1": {
+            "nombre": "Uruguay",
+            "anio": 2008,
+            "vecinos": [{"nombre": "Argentina", "direccion": "Oeste"},
+                        {"nombre": "Brazil", "direccion": "Norte"}]
+        }
+    }
+    ini = ConfigParser()
+    ini.read_dict(datos)
+    with open(archivo, "wt") as w:
+        ini.write(w)
+
+# LECTURA
+def leer_archivo(archivo: str):
+    ini = ConfigParser()
+    ini.read(archivo)
+    for seccion, valores in ini.items():
+        if len(valores) > 0:
+            print(f"[{seccion}]")
+            for nombre, valor in valores.items():
+                print(f"{nombre} = {valor}")</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<!-- ── YAML ── -->
+<h2 id="s2-yaml">Archivo YAML</h2>
+<p>Lenguaje de serializacion de datos. Comun en configuracion de aplicaciones.</p>
+
+<pre><code>!pip install pyyaml
+
+from yaml import dump, safe_load
+
+# ESCRITURA
+def escribir_archivo(archivo: str):
+    datos = {
+        "datos": [{
+            "pais": {"nombre": "Uruguay", "anio": 2008,
+                     "vecinos": [{"nombre": "Argentina", "direccion": "Oeste"}]}
+        }]
+    }
+    with open(archivo, "wt") as w:
+        dump(datos, w)
+
+# LECTURA
+def leer_archivo(archivo: str):
+    with open(archivo) as r:
+        dato = safe_load(r)
+    print(dump(dato))</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<div class="card">
+  <h4>Estructura YAML esperada:</h4>
+<pre><code>datos:
+  - pais:
+      anio: 2008
+      nombre: Uruguay
+      vecinos:
+        - direccion: Oeste
+          nombre: Argentina
+        - direccion: Norte
+          nombre: Brazil</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+</div>
+
+<!-- ── XML ── -->
+<h2 id="s2-xml">Archivo XML</h2>
+<p>Lenguaje de marcado extensible para almacenamiento y transmision de datos. Muy usado en APIs.</p>
+
+<pre><code>import xml.etree.ElementTree as ET
+from xml.dom.minidom import parseString, parse
+
+# ESCRITURA
+def escribir_archivo(archivo: str):
+    datos = ET.Element("datos")
+
+    pais = ET.SubElement(datos, "pais", {"nombre": "Uruguay"})
+    anio = ET.SubElement(pais, "anio")
+    anio.text = "2008"
+    vecinos = ET.SubElement(pais, "vecinos")
+    ET.SubElement(vecinos, "vecino", {"nombre": "Argentina", "direccion": "Oeste"})
+
+    with open(archivo, "wt") as w:
+        w.write(parseString(ET.tostring(datos)).toprettyxml())
+
+# LECTURA
+def leer_archivo(archivo: str):
+    dato = parse(archivo)
+    print('\n'.join([line for line in dato.toprettyxml().split('\n') if line.strip()]))</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<!-- ── CSV ── -->
+<h2 id="s2-csv">Archivo CSV</h2>
+<p>Representacion de tablas en texto plano. Columnas separadas por comas (u otro separador).</p>
+
+<pre><code>from csv import reader, writer
+
+# ESCRITURA
+def escribir_archivo(archivo: str):
+    datos = [
+        ["col_1", "col_2", "col_3"],
+        ["A", "B", "C"],
+        ["D", "E", "F"],
+    ]
+    with open(archivo, "wt") as w:
+        write_csv = writer(w)
+        write_csv.writerows(datos)
+
+# LECTURA
+def leer_archivo(archivo: str):
+    with open(archivo) as r:
+        read_csv = reader(r)
+        for line in read_csv:
+            print(line)</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<div class="warning">
+  Si un valor contiene comas, el modulo <code>csv</code> lo envuelve automaticamente entre comillas. Si escribis manualmente, tenes que manejar esto vos.
+</div>
+
+<!-- ── JSON ── -->
+<h2 id="s2-json">Archivo JSON</h2>
+<p>Notacion de objetos JavaScript. Alternativa a XML para intercambio de datos, muy usado en APIs web.</p>
+
+<pre><code>from json import dump, dumps, load
+
+# ESCRITURA
+def escribir_archivo(archivo: str):
+    datos = {
+        "datos": [{
+            "pais": {"nombre": "Uruguay", "anio": 2008,
+                     "vecinos": [{"nombre": "Argentina", "direccion": "Oeste"}]}
+        }]
+    }
+    with open(archivo, "wt") as w:
+        dump(datos, w, indent=4)  # indent para formato legible
+
+# LECTURA
+def leer_archivo(archivo: str):
+    with open(archivo) as r:
+        dato = load(r)
+    print(dumps(dato, indent=4))  # dumps = dict -> string JSON</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<div class="card">
+  <h4>Funciones JSON clave:</h4>
+  <table>
+    <tr><th>Funcion</th><th>Descripcion</th></tr>
+    <tr><td><code>dump(obj, file)</code></td><td>Escribe dict a archivo JSON</td></tr>
+    <tr><td><code>dumps(obj)</code></td><td>Convierte dict a string JSON</td></tr>
+    <tr><td><code>load(file)</code></td><td>Lee archivo JSON a dict</td></tr>
+    <tr><td><code>loads(str)</code></td><td>Convierte string JSON a dict</td></tr>
+  </table>
+</div>
+
+
+<!-- ╔═══════════════════════════════════════════╗ -->
+<!-- ║      SEMANA 3 - NUMPY & MATPLOTLIB        ║ -->
+<!-- ╚═══════════════════════════════════════════╝ -->
+<div class="separator"></div>
+<span class="semana-badge s3">SEMANA 3</span>
+
+<h2 id="s3-numpy">NumPy</h2>
+<p>Libreria para computacion numerica. Estructura principal: <strong>ndarray</strong> (N-dimensional array).</p>
+
+<pre><code>import numpy as np</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Tipos de datos NumPy</h3>
+<table>
+  <tr><th>Tipo</th><th>Descripcion</th></tr>
+  <tr><td><code>np.bool_</code></td><td>Booleano</td></tr>
+  <tr><td><code>np.int8/16/32/64</code></td><td>Enteros con signo</td></tr>
+  <tr><td><code>np.uint8/16/32/64</code></td><td>Enteros sin signo</td></tr>
+  <tr><td><code>np.float16/32/64</code></td><td>Punto flotante</td></tr>
+  <tr><td><code>np.complex64/128</code></td><td>Numeros complejos</td></tr>
+  <tr><td><code>np.str_</code></td><td>Cadena de texto</td></tr>
+</table>
+
+<h3>Crear arrays y matrices</h3>
+<pre><code># Desde listas
+array_1d = np.array([1, 2, 3, 4, 5])
+array_2d = np.array([[1, 2, 3], [4, 5, 6]])   # Matriz 2x3
+
+# Arrays especiales
+np.zeros((3, 3))           # Matriz 3x3 de ceros
+np.ones((2, 4))            # Matriz 2x4 de unos
+np.full((3, 3), 7)         # Matriz 3x3 llena de 7
+np.eye(4)                  # Matriz identidad 4x4
+np.arange(0, 20, 2)        # [0, 2, 4, ..., 18] (start, stop, step)
+np.linspace(0, 10, 100)    # 100 puntos equidistantes entre 0 y 10
+np.random.random((3, 3))   # Matriz 3x3 con valores aleatorios [0,1)
+np.random.randint(0, 10, (3, 3))  # Enteros aleatorios 0-9 en 3x3</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Atributos del array</h3>
+<pre><code>a = np.array([[1, 2, 3], [4, 5, 6]])
+
+a.ndim      # 2       (dimensiones)
+a.shape     # (2, 3)  (forma: filas x columnas)
+a.size      # 6       (total elementos)
+a.dtype     # int64   (tipo de dato)
+a.itemsize  # 8       (bytes por elemento)
+a.nbytes    # 48      (total bytes)</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Acceso a elementos</h3>
+<pre><code>a = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+
+a[0, 2]        # 3      (fila 0, columna 2)
+a[0]           # [1,2,3] (toda la fila 0)
+a[:, 1]        # [2,5,8] (toda la columna 1)
+a[0:2, 1:]     # [[2,3],[5,6]] (slicing)
+a[::-1]        # invierte filas</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Operaciones basicas</h3>
+<pre><code>a = np.array([1, 2, 3, 4])
+
+# Aritmetica elemento a elemento
+a + 10         # [11,12,13,14]
+a * 2          # [2,4,6,8]
+a ** 2         # [1,4,9,16]
+
+# Funciones matematicas
+np.sin(a)      np.cos(a)      np.exp(a)
+np.log(a)      np.sqrt(a)     np.abs(a)
+np.power(a, 2)
+
+# Comparaciones (retornan arrays booleanos)
+a > 2          # [False,False,True,True]
+a == 3         # [False,False,True,False]
+np.any(a > 3)  # True (alguno cumple?)
+np.all(a > 0)  # True (todos cumplen?)</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Reshape, Concatenar, Dividir</h3>
+<pre><code># Reshape
+a = np.arange(12)
+a.reshape(3, 4)         # Forma 3x4
+a.reshape(2, 2, 3)      # Forma 2x2x3
+
+# Concatenar
+np.concatenate([a1, a2], axis=0)   # por filas
+np.concatenate([a1, a2], axis=1)   # por columnas
+np.vstack([a1, a2])                # apilar vertical
+np.hstack([a1, a2])                # apilar horizontal
+
+# Dividir
+np.split(a, 3)          # en 3 partes iguales
+np.split(a, [2, 5])     # en posiciones 2 y 5</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Agregaciones</h3>
+<pre><code>a = np.array([[1, 2, 3], [4, 5, 6]])
+
+np.sum(a)              # 21 (todos)
+np.sum(a, axis=0)      # [5,7,9] (por columna)
+np.sum(a, axis=1)      # [6,15] (por fila)
+
+np.min(a)    np.max(a)    np.mean(a)
+np.std(a)    np.var(a)    np.median(a)
+np.prod(a)
+
+# Con reduce y accumulate
+np.add.reduce(a)       # suma total
+np.add.accumulate(a)   # suma acumulada</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Ordenamiento y where</h3>
+<pre><code>a = np.array([3, 1, 4, 1, 5])
+
+np.sort(a)                 # [1,1,3,4,5] (retorna copia)
+np.argsort(a)              # indices que ordenarian el array
+
+# where = if-else vectorizado
+np.where(a > 2, a, -1)    # [3,-1,4,-1,5]</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<!-- ── MATPLOTLIB ── -->
+<h2 id="s3-matplotlib">Matplotlib</h2>
+<p>Libreria para graficos 2D y 3D de calidad publicable.</p>
+
+<pre><code>import matplotlib.pyplot as plt
+import numpy as np</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Grafico de lineas (basico completo)</h3>
+<pre><code>x = np.linspace(0, 10, 100)
+
+figura = plt.figure(dpi=100)
+
+plt.plot(x, np.sin(x), linestyle="solid", color="green", label="Seno")
+plt.plot(x, np.cos(x), linestyle="dashed", color="red", label="Coseno")
+
+plt.legend()                                # mostrar etiquetas
+plt.title("Comparacion seno y coseno")      # titulo
+plt.xlabel("Eje X")                         # label eje X
+plt.ylabel("Eje Y")                         # label eje Y
+plt.grid()                                  # grilla
+plt.xlim(left=-1, right=11)                 # limites eje X
+plt.ylim(bottom=-1.5, top=1.5)             # limites eje Y
+plt.show()</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h4>Tipos de linea</h4>
+<table>
+  <tr><th>String</th><th>Simbolo</th><th>Resultado</th></tr>
+  <tr><td><code>'solid'</code></td><td><code>'-'</code></td><td>Linea continua</td></tr>
+  <tr><td><code>'dashed'</code></td><td><code>'--'</code></td><td>Linea discontinua</td></tr>
+  <tr><td><code>'dashdot'</code></td><td><code>'-.'</code></td><td>Linea punto-raya</td></tr>
+  <tr><td><code>'dotted'</code></td><td><code>':'</code></td><td>Puntos</td></tr>
+</table>
+
+<h3>Guardar imagen</h3>
+<pre><code>figura.savefig("./grafico.jpg")
+# Tipos: eps, jpeg, jpg, pdf, png, svg, tiff, etc.
+
+# Leer imagen guardada
+from IPython.display import Image
+Image("./grafico.jpg")</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Subplots</h3>
+<pre><code>figura, sub_plots = plt.subplots(nrows=2, ncols=2, dpi=180)
+figura.suptitle("Sub plots 2x2")
+
+sub_plots[0, 0].plot(x, np.sin(x), linestyle="solid", color="green")
+sub_plots[0, 0].set(title="Seno", xlabel="x", ylabel="sin(x)")
+
+sub_plots[1, 0].plot(x, np.cos(x), linestyle="dashed", color="red")
+sub_plots[1, 0].set(title="Coseno", xlabel="x", ylabel="cos(x)")
+
+figura.tight_layout()
+plt.show()</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Grafico de barras</h3>
+<pre><code>x1 = [0.25, 1.25, 2.25, 3.25, 4.25]
+y1 = [10, 55, 80, 32, 40]
+x2 = [0.75, 1.75, 2.75, 3.75, 4.75]
+y2 = [42, 26, 10, 29, 66]
+
+figura = plt.figure(dpi=100)
+plt.bar(x1, y1, label="Datos 1", width=0.3, color="red")
+plt.bar(x2, y2, label="Datos 2", width=0.3, color="green")
+plt.title("Grafico de barras")
+plt.legend()
+plt.show()
+
+# Barras contiguas (desplazadas)
+plt.bar(np.subtract(x1, 0.15), y1, label="D1", width=0.3, color="red")
+plt.bar(np.add(x1, 0.15), y2, label="D2", width=0.3, color="green")</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Histograma</h3>
+<pre><code>valores = [22,55,62,45,21,22,34,42,42,4,2,102,95,85,55,110]
+limites = [0,10,20,30,40,50,60,70,80,90,100]
+
+figura = plt.figure(dpi=100)
+plt.hist(valores, limites, histtype="step", color="blue")
+# histtype: bar, barstacked, step, stepfilled
+plt.title("Histograma")
+plt.show()</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Grafico de dispersion (scatter)</h3>
+<pre><code>plt.scatter(x1, y1, label="Datos 1", color="red")
+plt.scatter(x2, y2, label="Datos 2", color="purple")
+plt.title("Dispersion")
+plt.legend()
+plt.show()</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Grafico de torta (pie)</h3>
+<pre><code>divisiones = [7, 2, 2, 13]
+actividades = ["Dormir", "Comer", "Trabajar", "Recreacion"]
+colores = ["red", "purple", "blue", "orange"]
+
+plt.pie(divisiones,
+        labels=actividades,
+        colors=colores,
+        startangle=90,
+        explode=(0, 0, 0, 1),    # resaltar porcion
+        autopct="%.2f%%")        # formato porcentaje
+plt.title("Torta")
+plt.legend()
+plt.show()</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Grafico de contornos</h3>
+<pre><code>def funcion_contorno(x, y):
+    return np.add(np.power(np.sin(x), 10),
+                  np.multiply(np.cos(np.add(10, np.multiply(y, x))), np.cos(x)))
+
+ax = np.linspace(0, 5, 50)
+ay = np.linspace(0, 5, 40)
+x, y = np.meshgrid(ax, ay)
+z = funcion_contorno(x, y)
+
+plt.contour(x, y, z)
+plt.title("Contornos")
+plt.show()</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Graficos 3D</h3>
+<pre><code># Lineas 3D
+z = np.linspace(0, 2*np.pi)
+x, y = np.cos(z), np.sin(z)
+
+figura = plt.figure(dpi=100)
+ax = plt.axes(projection='3d')
+ax.stem(x, y, z)
+ax.set_xlabel('x'); ax.set_ylabel('y'); ax.set_zlabel('z')
+
+# Superficie 3D
+ax.plot_surface(x, y, z, cmap='viridis', edgecolor='none')
+
+# Wireframe
+ax.plot_wireframe(x, y, z)
+
+# Scatter 3D
+ax.scatter(x, y, z, c=z, cmap='viridis')
+
+# Cambiar angulo de vision
+ax.view_init(elev=0.5, azim=90, roll=30, vertical_axis='x')</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<!-- ── KAGGLE ── -->
+<h2 id="s3-kaggle">Kaggle y Datasets</h2>
+
+<div class="card">
+  <p><strong>Dataset</strong> = conjunto de datos. Cada columna es una variable, cada fila es un miembro del conjunto.</p>
+  <p><strong>Kaggle</strong> = plataforma con datasets publicos y competencias de data science.</p>
+</div>
+
+<h3>Configuracion (una sola vez)</h3>
+<pre><code>!pip install kaggle
+
+# 1. Registrarse en kaggle.com
+# 2. Settings > API > Create New API Token (descarga kaggle.json)
+# 3. Subir kaggle.json a Google Drive</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>En cada Colab</h3>
+<pre><code>from google.colab import drive
+drive.mount("/content/drive")
+
+!mkdir -p ~/.kaggle
+!cp /content/drive/MyDrive/kaggle/kaggle.json ~/.kaggle/
+!chmod 600 ~/.kaggle/kaggle.json
+
+# Listar datasets
+!kaggle datasets list
+
+# Descargar un dataset
+!kaggle datasets download --unzip -d dgoenrique/netflix-movies-and-tv-shows \
+    -p /content/drive/MyDrive/kaggle/datasets/netflix
+
+# Leer
+from csv import reader
+with open("ruta/al/archivo.csv") as r:
+    for line in reader(r):
+        print(line)</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+
+<!-- ╔═══════════════════════════════════════════╗ -->
+<!-- ║      SEMANA 4 - PANDAS & REGEX            ║ -->
+<!-- ╚═══════════════════════════════════════════╝ -->
+<div class="separator"></div>
+<span class="semana-badge s4">SEMANA 4</span>
+
+<h2 id="s4-pandas">Pandas</h2>
+<p>Libreria de codigo abierto para manipulacion y tratamiento de datos. Dos estructuras principales: <strong>Series</strong> y <strong>DataFrame</strong>.</p>
+
+<pre><code>import pandas as pd
+import numpy as np</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Series (1D)</h3>
+<p>Array unidimensional con indice. Todos los elementos del mismo tipo.</p>
+
+<pre><code># Desde lista
+materias = ["Matematicas", "Lengua", "Historia"]
+serie = pd.Series(data=materias)
+
+# Con indices personalizados
+serie = pd.Series(data=materias, index=[0, 1, 4], name="Materias")
+
+# Desde diccionario (keys = indices)
+notas = {"Matematicas": 9, "Lengua": 7.5, "Historia": 7}
+serie = pd.Series(data=notas, name="Notas")
+
+# Atributos
+serie.size       # cantidad de elementos
+serie.dtype      # tipo de dato
+serie.index      # indices
+serie.values     # valores como array</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>DataFrame (2D)</h3>
+<p>Tabla de datos. Cada columna es una Serie.</p>
+
+<pre><code># Crear DataFrame desde diccionarios
+df = pd.DataFrame({
+    "Pedro":  {"Matematicas": 7, "Lengua": 9.5, "Historia": 9},
+    "Juan":   {"Matematicas": 9, "Lengua": 7.5, "Historia": 7},
+    "Alegra": {"Matematicas": 9, "Lengua": 8.5, "Historia": 9}
+})
+
+# Atributos
+df.size      # cantidad total de valores
+df.shape     # (filas, columnas)
+df.ndim      # dimensiones (2)
+df.index     # indices de filas
+df.columns   # nombres de columnas
+df.values    # valores como array 2D</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Ordenamiento</h3>
+<pre><code># Por columnas (eje 1)
+df = df.sort_index(axis=1, ascending=True)
+
+# Por indice de filas (eje 0)
+df = df.sort_index(axis=0, ascending=True)
+
+# Por valores
+df = df.sort_values(by=["Juan", "Pedro"], ascending=False)</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Acceder a datos</h3>
+<pre><code># Por columna
+df["Pedro"]                  # Serie de Pedro
+df.Pedro                     # Igual (sintaxis punto)
+df[["Alegra", "Pedro"]]      # Multiples columnas
+
+# Valor especifico
+df["Pedro"]["Lengua"]        # por nombre
+df.loc["Lengua", "Pedro"]    # con loc (label-based)
+
+# Por posicion
+df.iloc[1]                   # fila 1 (toda)
+df.iloc[:, 1]                # columna 1 (toda)
+df.iat[3, 2]                 # celda fila 3, columna 2</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Agregar datos</h3>
+<pre><code># Nueva columna
+df["Angela"] = pd.Series([3, 8, 5.5], index=df.index)
+
+# Nueva fila con concat
+nueva_fila = {k: 0 for k in df.columns}
+df = pd.concat([df, pd.DataFrame(nueva_fila, index=["Total"])], axis=0)</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Operaciones con DataFrames</h3>
+<table>
+  <tr><th>Operador</th><th>Funcion Pandas</th></tr>
+  <tr><td><code>+</code></td><td><code>add()</code></td></tr>
+  <tr><td><code>-</code></td><td><code>sub()</code>, <code>subtract()</code></td></tr>
+  <tr><td><code>*</code></td><td><code>mul()</code>, <code>multiply()</code></td></tr>
+  <tr><td><code>/</code></td><td><code>truediv()</code>, <code>div()</code></td></tr>
+  <tr><td><code>//</code></td><td><code>floordiv()</code></td></tr>
+  <tr><td><code>%</code></td><td><code>mod()</code></td></tr>
+  <tr><td><code>**</code></td><td><code>pow()</code></td></tr>
+</table>
+
+<pre><code># Suma directa (NaN donde no coinciden columnas/filas)
+df_1 + df_2
+
+# Con fill_value para reemplazar NaN
+df_1.add(df_2, fill_value=0)
+
+# Funciones NumPy sobre DataFrames
+np.cos(df)           # sobre todo el DataFrame
+np.cos(df.iloc[1])   # sobre una fila
+np.cos(df["A"])      # sobre una columna</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Manejo de nulos (None / NaN)</h3>
+<table>
+  <tr><th>Tipo original</th><th>Conversion</th><th>Valor nulo</th></tr>
+  <tr><td>floating</td><td>Sin cambio</td><td><code>np.nan</code></td></tr>
+  <tr><td>integer</td><td>Cast a float64</td><td><code>np.nan</code></td></tr>
+  <tr><td>boolean</td><td>Cast a object</td><td><code>None</code> o <code>np.nan</code></td></tr>
+  <tr><td>object</td><td>Sin cambio</td><td><code>None</code> o <code>np.nan</code></td></tr>
+</table>
+
+<pre><code># Detectar nulos
+df.isnull()          # True donde hay None/NaN
+df.notnull()         # True donde NO hay None/NaN
+
+# Eliminar nulos
+df.dropna()                           # filas con algun nulo
+df.dropna(axis=1)                     # columnas con algun nulo
+df.dropna(thresh=3)                   # mantiene filas con al menos 3 valores no nulos
+df.dropna(subset=["Entero", "Float"]) # solo mira esas columnas
+
+# Rellenar nulos
+df.fillna('SUSTITUTO')                             # reemplaza todos
+df.fillna(value={'Entero': 10, 'Float': 10.5})     # por columna
+df.fillna('X', limit=1)                            # max 1 consecutivo</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Filtros y Query</h3>
+<pre><code># Filtros con booleanos
+df[np.greater(df["Angela"], 6)]                    # Angela > 6
+df[np.greater(df["Alegra"], 6) & np.greater(df["Angela"], 6)]  # AND
+df[np.greater(df["Alegra"], 6) | np.greater(df["Angela"], 6)]  # OR
+
+# Query (estilo SQL)
+df.query("Angela > 6")
+df.query("Angela > 6 and Alegra > 6")
+df.query("Angela > 6 or Alegra > 6")</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Agregaciones</h3>
+<table>
+  <tr><th>Funcion</th><th>Descripcion</th></tr>
+  <tr><td><code>count()</code></td><td>Cantidad de valores</td></tr>
+  <tr><td><code>sum()</code></td><td>Suma</td></tr>
+  <tr><td><code>mean()</code></td><td>Promedio</td></tr>
+  <tr><td><code>median()</code></td><td>Mediana</td></tr>
+  <tr><td><code>min()</code> / <code>max()</code></td><td>Minimo / Maximo</td></tr>
+  <tr><td><code>std()</code></td><td>Desviacion estandar</td></tr>
+  <tr><td><code>var()</code></td><td>Varianza</td></tr>
+  <tr><td><code>prod()</code></td><td>Producto</td></tr>
+</table>
+
+<pre><code>df.sum()              # por columnas (default axis=0)
+df.sum(axis=1)        # por filas
+df.mean()             # promedio por columnas
+df.describe()         # estadisticas completas (count, mean, std, min, 25%, 50%, 75%, max)</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Agrupaciones (groupby)</h3>
+<pre><code>df.groupby("Pedro").groups              # dict {valor: indices}
+df.groupby("Pedro")["Pedro"].sum()      # suma por grupo
+df.groupby("Pedro").sum()               # suma de todas las columnas por grupo
+df.groupby("Pedro").aggregate([min, np.sum, max])  # multiples funciones
+df.groupby(by="a", dropna=False).sum()  # incluir NaN como grupo</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Cargar datasets</h3>
+<pre><code># CSV
+df = pd.read_csv("archivo.csv")
+
+# Otras funciones
+pd.read_json("archivo.json")
+pd.read_excel("archivo.xlsx")
+pd.read_xml("archivo.xml")
+
+# Explorar
+df.head(10)      # primeras 10 filas
+df.tail(10)      # ultimas 10 filas
+df.describe()    # estadisticas</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Graficos con Pandas (usa matplotlib)</h3>
+<pre><code># Tipos de graficos: line, bar, barh, box, density, hexbin, hist, kde, pie, scatter
+
+df["total_rooms"].plot(kind="line", title="Titulo", xlabel="X", ylabel="Y")
+
+# Alternativa
+df["total_rooms"].plot.line(title="Titulo")
+
+# Multiples columnas
+df[["col1", "col2"]].plot.line(title="Comparacion")
+
+# Subplots
+df[["col1", "col2"]].plot.line(subplots=True, layout=(2, 1))</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<!-- ── REGEX ── -->
+<h2 id="s4-regex">Expresiones Regulares (Regex)</h2>
+
+<p>Secuencia de caracteres que forma un patron de busqueda para encontrar coincidencias en texto.</p>
+
+<pre><code>import re</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Expresiones basicas</h3>
+<table>
+  <tr><th>Expresion</th><th>Descripcion</th></tr>
+  <tr><td><code>.</code></td><td>Cualquier caracter excepto nueva linea</td></tr>
+  <tr><td><code>a</code></td><td>Caracter literal a</td></tr>
+  <tr><td><code>ab</code></td><td>Cadena literal ab</td></tr>
+  <tr><td><code>a|b</code></td><td>a OR b</td></tr>
+  <tr><td><code>a*</code></td><td>0 o mas a's</td></tr>
+  <tr><td><code>\</code></td><td>Caracter de escape</td></tr>
+</table>
+
+<h3>Cuantificadores</h3>
+<table>
+  <tr><th>Cuantificador</th><th>Descripcion</th></tr>
+  <tr><td><code>*</code></td><td>0 o mas valores</td></tr>
+  <tr><td><code>+</code></td><td>1 o mas valores</td></tr>
+  <tr><td><code>?</code></td><td>0 o 1 valor</td></tr>
+  <tr><td><code>{3}</code></td><td>Exactamente 3</td></tr>
+  <tr><td><code>{3,}</code></td><td>3 o mas</td></tr>
+  <tr><td><code>{,3}</code></td><td>Hasta 3</td></tr>
+  <tr><td><code>{3,5}</code></td><td>Entre 3 y 5</td></tr>
+</table>
+
+<h3>Grupos y rangos</h3>
+<table>
+  <tr><th>Expresion</th><th>Descripcion</th></tr>
+  <tr><td><code>(a|b)</code></td><td>Valor a o valor b</td></tr>
+  <tr><td><code>(...)</code></td><td>Grupo de valores</td></tr>
+  <tr><td><code>[abcd]</code></td><td>Rango: a, b, c, d</td></tr>
+  <tr><td><code>[^abcd]</code></td><td>Todo EXCEPTO a, b, c, d</td></tr>
+  <tr><td><code>[a-d]</code></td><td>Rango minusculas a-d</td></tr>
+  <tr><td><code>[A-D]</code></td><td>Rango mayusculas A-D</td></tr>
+  <tr><td><code>[0-3]</code></td><td>Rango numeros 0-3</td></tr>
+</table>
+
+<h3>Abreviaturas (shortcuts)</h3>
+<table>
+  <tr><th>Abreviatura</th><th>Descripcion</th></tr>
+  <tr><td><code>\d</code></td><td>Un digito [0-9]</td></tr>
+  <tr><td><code>\D</code></td><td>Todo lo que NO es digito</td></tr>
+  <tr><td><code>\w</code></td><td>Un caracter alfanumerico [a-zA-Z0-9_]</td></tr>
+  <tr><td><code>\W</code></td><td>Todo lo que NO es alfanumerico</td></tr>
+  <tr><td><code>\s</code></td><td>Espacio, tab, nueva linea</td></tr>
+  <tr><td><code>\S</code></td><td>Todo lo que NO es espacio</td></tr>
+  <tr><td><code>\b</code></td><td>Limite de palabra</td></tr>
+</table>
+
+<h3>Anclajes y banderas</h3>
+<table>
+  <tr><th>Anclaje</th><th>Descripcion</th></tr>
+  <tr><td><code>^</code></td><td>Comienzo del string</td></tr>
+  <tr><td><code>$</code></td><td>Fin del string</td></tr>
+  <tr><td><code>\b</code></td><td>Limite de palabra</td></tr>
+</table>
+<table>
+  <tr><th>Bandera</th><th>Descripcion</th></tr>
+  <tr><td><code>(?i)</code></td><td>Case-insensitive</td></tr>
+  <tr><td><code>(?m)</code></td><td>^ y $ aplican a cada linea</td></tr>
+  <tr><td><code>(?s)</code></td><td>El . machea nueva linea</td></tr>
+</table>
+
+<h3>Funciones del modulo <code>re</code></h3>
+<pre><code>cadena = "La inteligencia artificial surge en 1940..."
+
+# compile - compilar patron (recomendado si se usa muchas veces)
+patron = re.compile(r"\d{4}")
+
+# search - buscar primera coincidencia
+span = re.search(r"\d", cadena).span()
+# Retorna (inicio, fin) de la primera coincidencia
+
+# findall - encontrar TODAS las coincidencias
+re.findall(r"\d{4}", cadena)      # ['1940', '1950', ...]
+
+# finditer - iterator de coincidencias (con info de posicion)
+for match in re.finditer(r"\d{4}", cadena):
+    print(match)
+
+# split - dividir por patron
+re.split(r"\s(el|la|los|las)\s", cadena)
+
+# sub - reemplazar
+re.sub(r"\d", "--", cadena)       # reemplaza digitos por "--"
+
+# match - buscar al INICIO del string
+re.match(r"La", cadena)           # Match si empieza con "La"</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Ejemplos practicos de patrones</h3>
+<pre><code># Buscar anos (4 digitos)
+patron = re.compile(r"\d{4}")
+re.findall(patron, cadena)
+
+# Buscar 1 o mas digitos
+patron = re.compile(r"\d+")
+re.findall(patron, cadena)
+
+# Case-insensitive con flag
+patron = re.compile(r"(?i)(el|l[ao]s?)\s")
+
+# Reemplazar puntuacion
+patron = re.compile(r"(\.|,|;)")
+re.sub(patron, "#", cadena)
+
+# Palabras terminadas en 'as' o 'os'
+patron = re.compile(r"[ao]s\b")
+re.sub(patron, "#", cadena)</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Validar email</h3>
+<pre><code>patron = re.compile(r"^\w+((\.|-|_)?\w+)*@\w+((\.|-)?\w+)*(\.\w{2,4})+$")
+# ^\w+              = COMIENZA con 1+ letras
+# ((\.|-|_)?\w+)*   = opcionalmente punto/guion/_ + letras (repetible)
+# @                 = arroba obligatoria
+# \w+               = 1+ letras del dominio
+# ((\.|-)?\w+)*     = subdominio opcional
+# (\.\w{2,4})+$     = TERMINA con .xx a .xxxx
+
+email = "lcd-had141@ugr.edu.ar"
+"OK!" if re.match(patron, email) else "ERROR"</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+<h3>Validar fecha (yyyy-mm-dd)</h3>
+<pre><code>patron = re.compile(r"(\d{4}|\d{2})-(0[1-9]|1[0-2]|[1-9])-([1-9]|0[1-9]|[12]\d|3[01])$")
+# (\d{4}|\d{2})             = ano 2 o 4 digitos
+# (0[1-9]|1[0-2]|[1-9])     = mes 01-12 o 1-9
+# ([1-9]|0[1-9]|[12]\d|3[01]) = dia 1-31
+
+fecha = "1993-12-31"
+"OK!" if re.match(patron, fecha) else "ERROR"</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+
+
+<!-- ╔═══════════════════════════════════════════╗ -->
+<!-- ║            REFERENCIAS RAPIDAS            ║ -->
+<!-- ╚═══════════════════════════════════════════╝ -->
+<div class="separator"></div>
+
+<h2 id="ref-cheatsheet">Cheatsheet Rapido</h2>
+
+<div class="card">
+<h4>Imports mas usados</h4>
+<pre><code>import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import re
+from datetime import date, datetime, timedelta
+from csv import reader, writer
+from json import dump, dumps, load, loads
+from yaml import dump as yaml_dump, safe_load
+from configparser import ConfigParser
+import xml.etree.ElementTree as ET</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+</div>
+
+<div class="card">
+<h4>Template rapido para leer/escribir archivos</h4>
+<pre><code># LEER archivo
+with open("archivo.txt") as r:
+    contenido = r.read()
+
+# ESCRIBIR archivo
+with open("archivo.txt", "w") as w:
+    w.write("contenido")
+
+# LEER CSV con pandas (lo mas comun)
+df = pd.read_csv("datos.csv")
+df.head()
+df.describe()</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+</div>
+
+<div class="card">
+<h4>Patron comun de analisis con Pandas</h4>
+<pre><code># 1. Cargar
+df = pd.read_csv("datos.csv")
+
+# 2. Explorar
+df.head(10)
+df.shape
+df.describe()
+df.isnull().sum()
+
+# 3. Limpiar
+df = df.dropna()                    # o fillna()
+df = df[df["columna"] > 0]          # filtrar
+
+# 4. Analizar
+df.groupby("categoria").mean()
+df["columna"].value_counts()
+
+# 5. Visualizar
+df["columna"].plot(kind="hist")
+df.plot.scatter(x="col1", y="col2")
+plt.show()</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+</div>
+
+<!-- ── FORMATO COLAB ── -->
+<h2 id="ref-colab">Formato para Google Colab</h2>
+
+<div class="card">
+<h4>Estructura tipica de un Colab</h4>
+<pre><code># Celda de texto (Markdown):
+# Titulo del Notebook
+Descripcion del trabajo.
+
+# Celda de codigo:
+!pip install libreria
+
+# Celda de codigo:
+import libreria
+
+# Celda de texto:
+## Seccion 1
+Explicacion...
+
+# Celda de codigo:
+# codigo de la seccion
+
+# Celda de texto:
+## Resultados
+Analisis...</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+</div>
+
+<div class="card">
+<h4>Setup tipico de Colab</h4>
+<pre><code># Celda 1: Montar Drive
+from google.colab import drive
+drive.mount('/content/drive')
+
+# Celda 2: Instalar dependencias
+!pip install pyyaml kaggle tabulate
+
+# Celda 3: Imports
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import re</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+</div>
+
+<div class="card">
+<h4>Formulario de parametros <span class="colab-badge">Colab</span></h4>
+<pre><code>#@title Configuracion
+#@markdown Completa los parametros:
+
+archivo = "datos.csv"  #@param {type: "string"}
+filas = 100            #@param {type: "integer"}
+umbral = 0.5           #@param {type: "number"}
+mostrar_grafico = True #@param {type: "boolean"}
+metodo = "mean"        #@param ["mean", "median", "sum"]</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+</div>
+
+<div class="tip">
+  Para los formularios de Colab, las anotaciones <code>#@param</code> generan widgets interactivos automaticamente cuando se ejecuta la celda.
+</div>
+
+
+<!-- ── FOOTER ── -->
+<div style="margin-top: 80px; padding: 24px 0; border-top: 1px solid var(--border); text-align: center; color: var(--text-secondary); font-size: 0.85rem;">
+  Apuntes generados a partir del material de la materia Herramientas de Datos &mdash; Semanas 1 a 4
+</div>
+
+</div><!-- .main -->
+
+<button class="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">&#8593;</button>
+
+<script>
+// Copiar codigo
+function copyCode(btn) {
+  const code = btn.parentElement.querySelector('code') || btn.parentElement;
+  const text = code.textContent.replace('Copiar','').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copiado!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copiar';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+// Filtrar navegacion
+function filterNav(query) {
+  const links = document.querySelectorAll('.sidebar a');
+  const q = query.toLowerCase();
+  links.forEach(a => {
+    a.style.display = a.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+// Scroll top button
+window.addEventListener('scroll', () => {
+  const btn = document.querySelector('.scroll-top');
+  btn.style.display = window.scrollY > 400 ? 'block' : 'none';
+});
+
+// Smooth scroll
+document.querySelectorAll('.sidebar a').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) target.scrollIntoView({behavior: 'smooth', block: 'start'});
+    // close mobile nav
+    document.querySelector('.sidebar').classList.remove('open');
+  });
+});
+</script>
+
+</body>
+</html>
