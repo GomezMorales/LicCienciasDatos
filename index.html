@@ -301,6 +301,79 @@
 
   .separator { height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent3), var(--accent4)); border-radius: 2px; margin: 56px 0 40px; }
 
+  /* ── SPOILER / REVEAL ── */
+  .spoiler-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin: 14px 0 24px;
+    overflow: hidden;
+  }
+  .spoiler-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s;
+  }
+  .spoiler-header:hover {
+    background: rgba(88,166,255,0.06);
+  }
+  .spoiler-header .label {
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  .spoiler-header .arrow {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    transition: transform 0.3s;
+  }
+  .spoiler-box.open .spoiler-header .arrow {
+    transform: rotate(180deg);
+  }
+  .spoiler-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+    padding: 0 20px;
+  }
+  .spoiler-box.open .spoiler-content {
+    max-height: 8000px;
+    padding: 0 20px 20px;
+  }
+
+  /* ── EXERCISE CARD ── */
+  .exercise {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 16px 0 24px;
+  }
+  .exercise h4 {
+    color: var(--accent5);
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+  .exercise p {
+    margin-bottom: 10px;
+  }
+  .difficulty {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .easy { background: rgba(63,185,80,0.15); color: var(--accent2); }
+  .medium { background: rgba(227,179,65,0.15); color: var(--yellow); }
+  .hard { background: rgba(255,123,114,0.15); color: var(--red); }
+
   /* Print styles */
   @media print {
     .sidebar, .nav-toggle, .copy-btn, .scroll-top { display: none !important; }
@@ -346,6 +419,17 @@
   <div class="nav-section">Semana 4 - Pandas & Regex</div>
   <a href="#s4-pandas">Pandas</a>
   <a href="#s4-regex">Expresiones Regulares</a>
+
+  <div class="nav-section">Practica - Ejercicios</div>
+  <a href="#ej-s1">Ejercicios Semana 1</a>
+  <a href="#ej-s2">Ejercicios Semana 2</a>
+  <a href="#ej-s3">Ejercicios Semana 3</a>
+  <a href="#ej-s4">Ejercicios Semana 4</a>
+
+  <div class="nav-section">Guia Colab</div>
+  <a href="#guia-colab-estructura">Estructura de un Colab</a>
+  <a href="#guia-colab-orden">Orden y buenas practicas</a>
+  <a href="#guia-colab-trucos">Trucos utiles</a>
 
   <div class="nav-section">Referencias</div>
   <a href="#ref-cheatsheet">Cheatsheet Rapido</a>
@@ -1656,6 +1740,897 @@ fecha = "1993-12-31"
 
 
 <!-- ╔═══════════════════════════════════════════╗ -->
+<!-- ║      GUIA COMPLETA GOOGLE COLAB           ║ -->
+<!-- ╚═══════════════════════════════════════════╝ -->
+<div class="separator"></div>
+<span class="semana-badge s1">GUIA COLAB</span>
+
+<h2 id="guia-colab-estructura">Estructura de un Notebook en Colab</h2>
+
+<p>Organizar bien un notebook es clave para que sea legible, reproducible y profesional. Segui esta estructura:</p>
+
+<div class="card">
+<h4>Plantilla recomendada para cada Colab</h4>
+<pre><code># ===== CELDA DE TEXTO =====
+# Titulo del Notebook
+**Materia:** Herramientas de Datos
+**Autor:** Tu nombre
+**Fecha:** 2026-04-02
+**Descripcion:** Breve descripcion del trabajo.
+
+---
+
+# ===== CELDA DE CODIGO: Configuracion =====
+# Montar Drive (si es necesario)
+from google.colab import drive
+drive.mount('/content/drive')
+
+# ===== CELDA DE CODIGO: Instalar dependencias =====
+!pip install pyyaml kaggle tabulate
+
+# ===== CELDA DE CODIGO: Imports =====
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import re
+from datetime import datetime
+
+# ===== CELDA DE TEXTO =====
+## 1. Carga de Datos
+Explicacion de que datos se van a cargar...
+
+# ===== CELDA DE CODIGO =====
+df = pd.read_csv("datos.csv")
+df.head()
+
+# ===== CELDA DE TEXTO =====
+## 2. Analisis / Procesamiento
+Explicacion del analisis...
+
+# ===== CELDA DE CODIGO =====
+# codigo del analisis...
+
+# ===== CELDA DE TEXTO =====
+## 3. Resultados / Conclusiones
+Resumen de lo encontrado.</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+</div>
+
+<h2 id="guia-colab-orden">Orden y Buenas Practicas</h2>
+
+<div class="card">
+<h4>1. Estructura de celdas</h4>
+<ul>
+  <li><strong>Celda de texto ANTES de cada celda de codigo</strong> &mdash; explica que vas a hacer</li>
+  <li><strong>Titulo principal con <code>#</code></strong> para el nombre del notebook</li>
+  <li><strong>Secciones con <code>##</code></strong> para cada parte logica del trabajo</li>
+  <li><strong>Subsecciones con <code>###</code></strong> para detalles dentro de una seccion</li>
+</ul>
+</div>
+
+<div class="card">
+<h4>2. Orden recomendado de las celdas</h4>
+<table>
+  <tr><th>#</th><th>Seccion</th><th>Tipo celda</th><th>Contenido</th></tr>
+  <tr><td>1</td><td>Encabezado</td><td>Texto</td><td>Titulo, autor, fecha, descripcion</td></tr>
+  <tr><td>2</td><td>Setup</td><td>Codigo</td><td>Mount Drive, instalar librerias</td></tr>
+  <tr><td>3</td><td>Imports</td><td>Codigo</td><td>Todos los imports juntos</td></tr>
+  <tr><td>4</td><td>Constantes</td><td>Codigo</td><td>Paths, variables de configuracion</td></tr>
+  <tr><td>5</td><td>Funciones</td><td>Codigo</td><td>Funciones auxiliares reutilizables</td></tr>
+  <tr><td>6+</td><td>Desarrollo</td><td>Texto + Codigo</td><td>Alternar explicacion y codigo</td></tr>
+  <tr><td>N</td><td>Conclusiones</td><td>Texto</td><td>Resumen de resultados</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h4>3. Formato Markdown para celdas de texto</h4>
+<pre><code># Titulo Principal (uno solo por notebook)
+
+## Seccion (una por cada parte logica)
+
+### Subseccion
+
+Texto normal con **negrita** y *cursiva*.
+
+`codigo en linea` para nombres de variables o funciones.
+
+```python
+# bloque de codigo para mostrar sintaxis
+print("ejemplo")
+```
+
+> Nota importante o cita
+
+| Columna 1 | Columna 2 |
+| --- | --- |
+| dato 1 | dato 2 |
+
+- Lista con viñetas
+- Otro item
+  - Sub-item
+
+1. Lista numerada
+2. Segundo paso
+
+---  (separador horizontal)
+
+[Texto del link](https://url.com)</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+</div>
+
+<div class="card">
+<h4>4. Formularios para parametros</h4>
+<pre><code>#@title Configuracion del Ejercicio
+#@markdown Modifica los parametros segun necesites:
+#@markdown ---
+
+archivo = "datos.csv"  #@param {type: "string"}
+cantidad = 100         #@param {type: "integer"}
+umbral = 0.5           #@param {type: "number"}
+activo = True          #@param {type: "boolean"}
+fecha = "2026-04-02"   #@param {type: "date"}
+
+#@markdown ---
+rango = 50             #@param {type: "slider", min: 0, max: 100}
+metodo = "mean"        #@param ["mean", "median", "sum", "count"]</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+</div>
+
+<h2 id="guia-colab-trucos">Trucos Utiles de Colab</h2>
+
+<div class="card">
+<h4>Comandos esenciales</h4>
+<table>
+  <tr><th>Accion</th><th>Comando</th></tr>
+  <tr><td>Ejecutar celda</td><td><code>Shift + Enter</code> (y pasa a la siguiente)</td></tr>
+  <tr><td>Ejecutar celda (sin avanzar)</td><td><code>Ctrl + Enter</code></td></tr>
+  <tr><td>Insertar celda arriba</td><td><code>Ctrl + M, A</code></td></tr>
+  <tr><td>Insertar celda abajo</td><td><code>Ctrl + M, B</code></td></tr>
+  <tr><td>Eliminar celda</td><td><code>Ctrl + M, D</code></td></tr>
+  <tr><td>Convertir a texto</td><td><code>Ctrl + M, M</code></td></tr>
+  <tr><td>Convertir a codigo</td><td><code>Ctrl + M, Y</code></td></tr>
+  <tr><td>Ejecutar todo</td><td><code>Ctrl + F9</code></td></tr>
+  <tr><td>Buscar y reemplazar</td><td><code>Ctrl + H</code></td></tr>
+</table>
+</div>
+
+<div class="card">
+<h4>Diferencia ! vs % (recordatorio rapido)</h4>
+<pre><code># ! = sub-shell (NO persiste estado)
+!cd /tmp        # NO cambia directorio del notebook
+!pip install x  # SI funciona (no necesita persistir)
+
+# % = magic command (SI persiste estado)
+%cd /tmp        # SI cambia directorio
+%ls             # lista en el directorio actual
+%time codigo    # mide tiempo de ejecucion
+%who            # lista variables definidas</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+</div>
+
+<div class="card">
+<h4>Template rapido: Ejercicio completo en Colab</h4>
+<pre><code># ── CELDA TEXTO ──
+# Ejercicio N
+Enunciado del ejercicio con **palabras clave resaltadas**.
+
+# ── CELDA CODIGO (setup) ──
+#@title Parametros del Ejercicio
+valor = 10 #@param {type: "integer"}
+
+# ── CELDA CODIGO (solucion) ──
+# Resolucion
+resultado = valor * 2
+print(f"El resultado es: {resultado}")
+
+# ── CELDA TEXTO ──
+### Conclusion
+El resultado muestra que...</code><button class="copy-btn" onclick="copyCode(this)">Copiar</button></pre>
+</div>
+
+<div class="tip">
+  Siempre ejecuta <strong>Runtime &gt; Restart and run all</strong> antes de entregar para verificar que todo corre de principio a fin sin errores.
+</div>
+
+
+<!-- ╔═══════════════════════════════════════════╗ -->
+<!-- ║        EJERCICIOS PARA PRACTICAR          ║ -->
+<!-- ╚═══════════════════════════════════════════╝ -->
+<div class="separator"></div>
+<span class="semana-badge s1">PRACTICA</span>
+
+<h2 id="ej-s1">Ejercicios Semana 1 &mdash; Python Base</h2>
+<p>Intenta resolver cada ejercicio por tu cuenta antes de ver la solucion. Hace click en <strong>"Ver solucion"</strong> solo cuando termines o estes trabado.</p>
+
+<!-- EJ 1.1 -->
+<div class="exercise">
+  <h4>Ejercicio 1.1 &mdash; Suma de N numeros naturales <span class="difficulty easy">Facil</span></h4>
+  <p>Crear un script que calcule la suma de los <strong>n</strong> primeros numeros naturales y muestre el resultado. Usa un formulario de Colab para el parametro <code>n</code>.</p>
+  <p><em>Ejemplo: n=5 &rarr; 1+2+3+4+5 = 15</em></p>
+</div>
+<div class="spoiler-box" onclick="this.classList.toggle('open')">
+  <div class="spoiler-header"><span class="label">Ver solucion</span><span class="arrow">&#9660;</span></div>
+  <div class="spoiler-content">
+<pre><code>#@title
+primeros_numero_naturales = 99 #@param {type: "integer"}
+
+if primeros_numero_naturales <= 0:
+    print("No se ingreso un numero natural")
+else:
+    suma = 0
+    for valor in range(1, primeros_numero_naturales + 1):
+        suma += valor
+    print(f"La suma de los {primeros_numero_naturales} primeros numeros naturales es {suma}")</code><button class="copy-btn" onclick="copyCode(this); event.stopPropagation()">Copiar</button></pre>
+  </div>
+</div>
+
+<!-- EJ 1.2 -->
+<div class="exercise">
+  <h4>Ejercicio 1.2 &mdash; Suma de impares <span class="difficulty easy">Facil</span></h4>
+  <p>Crear un script que calcule la suma de los <strong>n</strong> primeros numeros naturales <strong>impares</strong>. Resolver de <strong>dos formas distintas</strong>: con <code>range(start, stop, step)</code> y con <code>if</code> dentro del loop.</p>
+</div>
+<div class="spoiler-box" onclick="this.classList.toggle('open')">
+  <div class="spoiler-header"><span class="label">Ver solucion</span><span class="arrow">&#9660;</span></div>
+  <div class="spoiler-content">
+<pre><code># Forma 1: con step en range
+suma_impares = 0
+for valor in range(1, n + 1, 2):
+    suma_impares += valor
+
+# Forma 2: con if
+suma_impares = 0
+for valor in range(1, n + 1):
+    if valor % 2 != 0:
+        suma_impares += valor
+
+print(f"La suma de impares es {suma_impares}")</code><button class="copy-btn" onclick="copyCode(this); event.stopPropagation()">Copiar</button></pre>
+  </div>
+</div>
+
+<!-- EJ 1.3 -->
+<div class="exercise">
+  <h4>Ejercicio 1.3 &mdash; Contar caracteres repetidos <span class="difficulty medium">Medio</span></h4>
+  <p>Dado un texto largo, contar la cantidad de repeticiones de cada caracter (case-sensitive). Mostrar la <strong>letra</strong> y la <strong>cantidad</strong> de veces que aparece, ordenado alfabeticamente. Manejar los casos especiales de <code>\n</code> (enter) y <code>" "</code> (espacio).</p>
+  <p><em>Pista: usa un diccionario para acumular conteos.</em></p>
+</div>
+<div class="spoiler-box" onclick="this.classList.toggle('open')">
+  <div class="spoiler-header"><span class="label">Ver solucion</span><span class="arrow">&#9660;</span></div>
+  <div class="spoiler-content">
+<pre><code>texto = """Un especialista en machine learning es responsable..."""
+
+repeticiones = {}
+for caracter in texto:
+    if caracter in repeticiones:
+        repeticiones[caracter] += 1
+    else:
+        repeticiones[caracter] = 1
+
+for caracter in sorted(repeticiones.keys()):
+    if caracter == "\n":
+        print(f"enter: {repeticiones[caracter]}")
+    elif caracter == " ":
+        print(f"espacio: {repeticiones[caracter]}")
+    else:
+        print(f"{caracter}: {repeticiones[caracter]}")</code><button class="copy-btn" onclick="copyCode(this); event.stopPropagation()">Copiar</button></pre>
+  </div>
+</div>
+
+<!-- EJ 1.4 -->
+<div class="exercise">
+  <h4>Ejercicio 1.4 &mdash; Triangulo de Pascal <span class="difficulty hard">Dificil</span></h4>
+  <p>Crear un script que dado <strong>n</strong> filas, genere el <strong>Triangulo de Pascal</strong>:</p>
+<pre><code>1
+1 1
+1 2 1
+1 3 3 1
+1 4 6 4 1</code></pre>
+  <p><em>Pista: cada valor es la suma de los dos valores de la fila anterior que estan arriba de el.</em></p>
+</div>
+<div class="spoiler-box" onclick="this.classList.toggle('open')">
+  <div class="spoiler-header"><span class="label">Ver solucion</span><span class="arrow">&#9660;</span></div>
+  <div class="spoiler-content">
+<pre><code>#@title
+filas = 10 #@param {type: "integer"}
+
+estructura = []
+if filas >= 1:
+    estructura.append([1])
+if filas >= 2:
+    estructura.append([1, 1])
+if filas >= 3:
+    for i in range(2, filas + 1):
+        fila = [1]
+        for j in range(1, i):
+            fila.append(estructura[i-1][j-1] + estructura[i-1][j])
+        fila.append(1)
+        estructura.append(fila)
+
+for p in estructura:
+    print(" ".join(map(str, p)))</code><button class="copy-btn" onclick="copyCode(this); event.stopPropagation()">Copiar</button></pre>
+  </div>
+</div>
+
+<!-- EJ 1.5 -->
+<div class="exercise">
+  <h4>Ejercicio 1.5 &mdash; Palindromo <span class="difficulty medium">Medio</span></h4>
+  <p>Verificar si un texto es <strong>palindromo</strong> (se lee igual de izquierda a derecha que de derecha a izquierda). No tener en cuenta los espacios en blanco.</p>
+  <p><em>Palindromo: "eva usaba rimel y le miraba suave"</em></p>
+  <p><em>No palindromo: "puro chile es tu cielo azulado"</em></p>
+</div>
+<div class="spoiler-box" onclick="this.classList.toggle('open')">
+  <div class="spoiler-header"><span class="label">Ver solucion</span><span class="arrow">&#9660;</span></div>
+  <div class="spoiler-content">
+<pre><code>#@title
+frase = "eva usaba rimel y le miraba suave" #@param {type: "string"}
+
+frase = frase.replace(" ", "")
+if len(frase) == 0:
+    print("No se ingreso una frase")
+else:
+    palindromo = True
+    posicion = 0
+    longitud_frase = len(frase)
+    mitad_frase = longitud_frase // 2
+    while posicion <= mitad_frase and palindromo:
+        palindromo = frase[posicion] == frase[longitud_frase - posicion - 1]
+        posicion += 1
+    if palindromo:
+        print("La frase es un palindromo")
+    else:
+        print("La frase NO es un palindromo")</code><button class="copy-btn" onclick="copyCode(this); event.stopPropagation()">Copiar</button></pre>
+  </div>
+</div>
+
+<!-- EJ 1.6 -->
+<div class="exercise">
+  <h4>Ejercicio 1.6 &mdash; Cifrado por repeticiones <span class="difficulty medium">Medio</span></h4>
+  <p>Dado un texto, contar las repeticiones de cada caracter (case-sensitive) y luego <strong>cifrar</strong> el texto reemplazando cada caracter por su cantidad de repeticiones.</p>
+  <p><em>Ejemplo: "ala" &rarr; a=2, l=1 &rarr; cifrado: "212"</em></p>
+</div>
+<div class="spoiler-box" onclick="this.classList.toggle('open')">
+  <div class="spoiler-header"><span class="label">Ver solucion</span><span class="arrow">&#9660;</span></div>
+  <div class="spoiler-content">
+<pre><code>#@title
+texto_cifrado = "Herramientas de Software" #@param {type: "string"}
+
+repeticiones = {}
+for caracter in texto_cifrado:
+    if caracter in repeticiones:
+        repeticiones[caracter] += 1
+    else:
+        repeticiones[caracter] = 1
+
+respuesta = ""
+for caracter in texto_cifrado:
+    respuesta += str(repeticiones[caracter])
+
+print(f"Texto: {texto_cifrado}")
+print(f"Cifrado: {respuesta}")</code><button class="copy-btn" onclick="copyCode(this); event.stopPropagation()">Copiar</button></pre>
+  </div>
+</div>
+
+
+<!-- ═══════════ EJERCICIOS SEMANA 2 ═══════════ -->
+<h2 id="ej-s2">Ejercicios Semana 2 &mdash; Archivos</h2>
+
+<!-- EJ 2.1 -->
+<div class="exercise">
+  <h4>Ejercicio 2.1 &mdash; Contar letras de un archivo <span class="difficulty easy">Facil</span></h4>
+  <p>Leer un archivo de texto (ej: <code>README.md</code>) y contar la cantidad de veces que se repite cada caracter. Mostrar el resultado en una <strong>tabla</strong> usando <code>tabulate</code>.</p>
+</div>
+<div class="spoiler-box" onclick="this.classList.toggle('open')">
+  <div class="spoiler-header"><span class="label">Ver solucion</span><span class="arrow">&#9660;</span></div>
+  <div class="spoiler-content">
+<pre><code>!pip install tabulate
+from tabulate import tabulate
+
+archivo_md = "/content/sample_data/README.md"
+with open(archivo_md) as r:
+    texto_md = r.read()
+
+repeticiones = {}
+for caracter in texto_md:
+    if caracter in repeticiones:
+        repeticiones[caracter] += 1
+    else:
+        repeticiones[caracter] = 1
+
+tabla = []
+for caracter in sorted(repeticiones.keys()):
+    if caracter == "\n":
+        tabla.append(["enter", repeticiones[caracter]])
+    elif caracter == " ":
+        tabla.append(["espacio", repeticiones[caracter]])
+    else:
+        tabla.append([caracter, repeticiones[caracter]])
+
+print(tabulate(tabular_data=tabla, headers=["Caracter", "Cantidad"]))</code><button class="copy-btn" onclick="copyCode(this); event.stopPropagation()">Copiar</button></pre>
+  </div>
+</div>
+
+<!-- EJ 2.2 -->
+<div class="exercise">
+  <h4>Ejercicio 2.2 &mdash; Filtrar JSON por posiciones pares <span class="difficulty easy">Facil</span></h4>
+  <p>Leer un archivo JSON que contiene una lista de objetos. Guardar en un <strong>nuevo archivo</strong> solo los objetos en <strong>posiciones pares</strong> (0, 2, 4...).</p>
+</div>
+<div class="spoiler-box" onclick="this.classList.toggle('open')">
+  <div class="spoiler-header"><span class="label">Ver solucion</span><span class="arrow">&#9660;</span></div>
+  <div class="spoiler-content">
+<pre><code>from json import load, dump
+
+with open("anscombe.json") as r:
+    objetos = load(r)
+
+# Filtrar posiciones pares con enumerate + list comprehension
+nuevos = [obj for pos, obj in enumerate(objetos) if pos % 2 == 0]
+
+with open("anscombe_pares.json", "w") as w:
+    dump(nuevos, w)</code><button class="copy-btn" onclick="copyCode(this); event.stopPropagation()">Copiar</button></pre>
+  </div>
+</div>
+
+<!-- EJ 2.3 -->
+<div class="exercise">
+  <h4>Ejercicio 2.3 &mdash; Filtrar CSV por columna <span class="difficulty medium">Medio</span></h4>
+  <p>Leer un archivo CSV y generar un nuevo archivo solo con las filas donde una columna especifica tiene un valor determinado (ej: <code>housing_median_age == 30</code>).</p>
+</div>
+<div class="spoiler-box" onclick="this.classList.toggle('open')">
+  <div class="spoiler-header"><span class="label">Ver solucion</span><span class="arrow">&#9660;</span></div>
+  <div class="spoiler-content">
+<pre><code>from csv import reader, writer
+
+with open("california_housing_test.csv") as r:
+    matriz = list(reader(r))
+
+cabecera = matriz[0]
+matriz.pop(0)
+
+# Filtrar por columna 2 (housing_median_age) == 30
+nuevas_filas = [fila for fila in matriz if float(fila[2]) == 30.]
+
+with open("california_housing_filtrado.csv", "w") as w:
+    csv_writer = writer(w)
+    csv_writer.writerows([cabecera] + nuevas_filas)</code><button class="copy-btn" onclick="copyCode(this); event.stopPropagation()">Copiar</button></pre>
+  </div>
+</div>
+
+<!-- EJ 2.4 -->
+<div class="exercise">
+  <h4>Ejercicio 2.4 &mdash; Filtrar CSV por conteo de valor <span class="difficulty medium">Medio</span></h4>
+  <p>Leer un CSV y generar un nuevo archivo donde cada fila debe contener el numero <strong>253</strong> exactamente <strong>3 veces</strong>.</p>
+</div>
+<div class="spoiler-box" onclick="this.classList.toggle('open')">
+  <div class="spoiler-header"><span class="label">Ver solucion</span><span class="arrow">&#9660;</span></div>
+  <div class="spoiler-content">
+<pre><code>from csv import reader, writer
+
+with open("mnist_test.csv") as r:
+    matriz = list(reader(r))
+
+cabecera = matriz[0]
+matriz.pop(0)
+
+# Filtrar: el valor "253" aparece exactamente 3 veces en la fila
+nuevas_filas = [fila for fila in matriz if fila.count("253") == 3]
+
+with open("mnist_filtrado.csv", "w") as w:
+    csv_writer = writer(w)
+    csv_writer.writerows([cabecera] + nuevas_filas)</code><button class="copy-btn" onclick="copyCode(this); event.stopPropagation()">Copiar</button></pre>
+  </div>
+</div>
+
+<!-- EJ 2.5 -->
+<div class="exercise">
+  <h4>Ejercicio 2.5 &mdash; Convertir JSON a CSV, INI y YAML <span class="difficulty hard">Dificil</span></h4>
+  <p>Leer un archivo JSON y transformar/guardar su contenido en 3 formatos: <strong>CSV</strong>, <strong>INI</strong> y <strong>YAML</strong>.</p>
+</div>
+<div class="spoiler-box" onclick="this.classList.toggle('open')">
+  <div class="spoiler-header"><span class="label">Ver solucion</span><span class="arrow">&#9660;</span></div>
+  <div class="spoiler-content">
+<pre><code>from json import load
+from csv import writer
+from configparser import ConfigParser
+from yaml import dump
+
+# Leer JSON
+with open("anscombe.json") as r:
+    objetos = load(r)
+
+# ── A CSV ──
+cabecera = [list(objetos[0].keys())]
+filas = [list(obj.values()) for obj in objetos]
+with open("anscombe.csv", "w") as w:
+    writer(w).writerows(cabecera + filas)
+
+# ── A INI ──
+tabla_ini = {f"Dato_{i:02d}": obj for i, obj in enumerate(objetos)}
+ini = ConfigParser()
+ini.read_dict(tabla_ini)
+with open("anscombe.ini", "w") as w:
+    ini.write(w)
+
+# ── A YAML ──
+tabla_yaml = {f"Dato_{i:02d}": obj for i, obj in enumerate(objetos)}
+with open("anscombe.yaml", "w") as w:
+    dump(tabla_yaml, w)</code><button class="copy-btn" onclick="copyCode(this); event.stopPropagation()">Copiar</button></pre>
+  </div>
+</div>
+
+
+<!-- ═══════════ EJERCICIOS SEMANA 3 ═══════════ -->
+<h2 id="ej-s3">Ejercicios Semana 3 &mdash; NumPy y Matplotlib</h2>
+
+<!-- EJ 3.1 -->
+<div class="exercise">
+  <h4>Ejercicio 3.1 &mdash; Crear arreglos <span class="difficulty easy">Facil</span></h4>
+  <p>Crear los siguientes arreglos:</p>
+  <ol>
+    <li>Arreglo de <strong>20 valores consecutivos</strong></li>
+    <li><strong>10 valores equidistantes</strong> entre 5 y 15</li>
+    <li>Arreglo de <strong>10 valores entre 0 y 1</strong></li>
+  </ol>
+</div>
+<div class="spoiler-box" onclick="this.classList.toggle('open')">
+  <div class="spoiler-header"><span class="label">Ver solucion</span><span class="arrow">&#9660;</span></div>
+  <div class="spoiler-content">
+<pre><code>import numpy as np
+
+# 1. 20 valores consecutivos
+print(np.arange(start=0, stop=20))
+
+# 2. 10 valores equidistantes entre 5 y 15
+print(np.linspace(start=5, stop=15, num=10))
+
+# 3. 10 valores entre 0 y 1
+print(np.linspace(start=0, stop=1, num=10))</code><button class="copy-btn" onclick="copyCode(this); event.stopPropagation()">Copiar</button></pre>
+  </div>
+</div>
+
+<!-- EJ 3.2 -->
+<div class="exercise">
+  <h4>Ejercicio 3.2 &mdash; Crear matrices con reshape <span class="difficulty easy">Facil</span></h4>
+  <p>Crear los siguientes:</p>
+  <ol>
+    <li>Arreglo de 6 posiciones &rarr; crear <strong>2 matrices</strong> con diferente forma</li>
+    <li>Matriz de <strong>3x8</strong> con enteros aleatorios entre 100 y 200</li>
+    <li>Arreglo de 60 posiciones &rarr; crear al menos <strong>10 matrices</strong> con diferente forma</li>
+    <li>Matriz diagonal <strong>5x6</strong> con diagonal comenzando en columna 3</li>
+    <li>Matriz diagonal <strong>5x6</strong> con diagonal comenzando en fila 3</li>
+  </ol>
+</div>
+<div class="spoiler-box" onclick="this.classList.toggle('open')">
+  <div class="spoiler-header"><span class="label">Ver solucion</span><span class="arrow">&#9660;</span></div>
+  <div class="spoiler-content">
+<pre><code>import numpy as np
+
+# 1. Arreglo de 6 -> 2 matrices
+a = np.linspace(0, 6, 6)
+print(a.reshape(2, 3))
+print(a.reshape(3, 2))
+
+# 2. Matriz 3x8 (aleatorios 100-200)
+print(np.random.randint(100, 200, (3, 8)))
+
+# 3. Arreglo de 60 -> 10 matrices
+a = np.linspace(0, 6, 60)
+print(a.reshape(2,30))    # y asi con (30,2), (3,20), (20,3), (5,12),
+                           # (12,5), (15,4), (4,15), (10,6), (6,10)
+
+# 4. Diagonal desde columna 3
+print(np.eye(N=5, M=6, k=3))
+
+# 5. Diagonal desde fila 3
+print(np.eye(N=5, M=6, k=-3))</code><button class="copy-btn" onclick="copyCode(this); event.stopPropagation()">Copiar</button></pre>
+  </div>
+</div>
+
+<!-- EJ 3.3 -->
+<div class="exercise">
+  <h4>Ejercicio 3.3 &mdash; Operaciones con matrices <span class="difficulty hard">Dificil</span></h4>
+  <p>Dadas dos matrices 10x10 (pueden tener <code>NaN</code>), obtener:</p>
+  <ol>
+    <li>La suma, producto, division y resta</li>
+    <li>El valor absoluto</li>
+    <li>El valor minimo y su indice</li>
+    <li>El valor maximo y su indice</li>
+    <li>La mediana</li>
+    <li>El valor central del arreglo aplanado</li>
+  </ol>
+  <p><em>Pista: usa <code>np.nanmin</code>, <code>np.nanargmin</code>, <code>np.nanmedian</code>, etc. para manejar NaN.</em></p>
+</div>
+<div class="spoiler-box" onclick="this.classList.toggle('open')">
+  <div class="spoiler-header"><span class="label">Ver solucion</span><span class="arrow">&#9660;</span></div>
+  <div class="spoiler-content">
+<pre><code>import numpy as np
+
+# Crear matrices (con algun NaN)
+m1 = np.random.random((10, 10))
+m1[4, 4] = np.nan
+m2 = np.random.random((10, 10))
+
+# Operaciones
+suma = np.add(m1, m2)
+print("Suma:\n", suma)
+print("Producto:\n", np.multiply(m1, m2))
+print("Division:\n", np.divide(m1, m2))
+print("Resta:\n", np.subtract(m1, m2))
+print("Valor absoluto m1:\n", np.abs(m1))
+
+# Min/Max con NaN
+print(f"Minimo: {np.nanmin(suma)}, indice: {np.nanargmin(suma)}")
+print(f"  Posicion en matriz: {np.unravel_index(np.nanargmin(suma), suma.shape)}")
+print(f"Maximo: {np.nanmax(suma)}, indice: {np.nanargmax(suma)}")
+
+# Mediana y centro
+print("Mediana:", np.nanmedian(suma))
+flat = suma.flatten()
+print("Valor central:", flat[flat.size // 2])</code><button class="copy-btn" onclick="copyCode(this); event.stopPropagation()">Copiar</button></pre>
+  </div>
+</div>
+
+<!-- EJ 3.4 -->
+<div class="exercise">
+  <h4>Ejercicio 3.4 &mdash; Normalizar una matriz <span class="difficulty medium">Medio</span></h4>
+  <p>Dado un arreglo aleatorio de 200 enteros, generar una matriz de <strong>10x20</strong> y <strong>normalizarla</strong> (dividir cada valor por el maximo). Mostrar ambas matrices.</p>
+</div>
+<div class="spoiler-box" onclick="this.classList.toggle('open')">
+  <div class="spoiler-header"><span class="label">Ver solucion</span><span class="arrow">&#9660;</span></div>
+  <div class="spoiler-content">
+<pre><code>arreglo = np.random.randint(low=0, high=12345, size=200)
+matriz_normal = arreglo.reshape(10, 20)
+maximo = arreglo.max()
+matriz_normalizada = np.divide(matriz_normal, maximo)
+
+print("Matriz original:\n", matriz_normal)
+print("\nMatriz normalizada:\n", matriz_normalizada)</code><button class="copy-btn" onclick="copyCode(this); event.stopPropagation()">Copiar</button></pre>
+  </div>
+</div>
+
+<!-- EJ 3.5 -->
+<div class="exercise">
+  <h4>Ejercicio 3.5 &mdash; Filtrar por mediana con where <span class="difficulty medium">Medio</span></h4>
+  <p>Dada una matriz, generar una <strong>nueva matriz</strong> donde: si el valor es mayor a la mediana se mantiene, si no se pone <strong>0</strong>.</p>
+  <p><em>Pista: usa <code>np.where()</code>.</em></p>
+</div>
+<div class="spoiler-box" onclick="this.classList.toggle('open')">
+  <div class="spoiler-header"><span class="label">Ver solucion</span><span class="arrow">&#9660;</span></div>
+  <div class="spoiler-content">
+<pre><code>matriz = np.random.randint(0, 12345, 200).reshape(10, 20)
+mediana = np.nanmedian(matriz)
+
+print("Matriz original:\n", matriz)
+print("Mediana:", mediana)
+print("Nueva matriz:\n", np.where(np.greater(matriz, mediana), matriz, 0))</code><button class="copy-btn" onclick="copyCode(this); event.stopPropagation()">Copiar</button></pre>
+  </div>
+</div>
+
+<!-- EJ 3.6 -->
+<div class="exercise">
+  <h4>Ejercicio 3.6 &mdash; Grafico logaritmico <span class="difficulty easy">Facil</span></h4>
+  <p>Crear un grafico del <strong>logaritmo</strong> de 100 puntos equidistantes entre 0.000001 y 100. El grafico debe tener: 100 dpi, linea purpura con guiones, titulo, leyendas y grilla.</p>
+</div>
+<div class="spoiler-box" onclick="this.classList.toggle('open')">
+  <div class="spoiler-header"><span class="label">Ver solucion</span><span class="arrow">&#9660;</span></div>
+  <div class="spoiler-content">
+<pre><code>import matplotlib.pyplot as plt
+import numpy as np
+
+x = np.linspace(0.00001, 100, 100)
+y = np.log(x)
+
+figura = plt.figure(dpi=100)
+plt.plot(x, y, linestyle="--", color="purple", label="log(x)")
+plt.title("Logaritmo")
+plt.xlabel("X")
+plt.ylabel("log(x)")
+plt.legend()
+plt.grid()
+plt.show()</code><button class="copy-btn" onclick="copyCode(this); event.stopPropagation()">Copiar</button></pre>
+  </div>
+</div>
+
+<!-- EJ 3.7 -->
+<div class="exercise">
+  <h4>Ejercicio 3.7 &mdash; Grafico de barras con suma por filas <span class="difficulty medium">Medio</span></h4>
+  <p>Dada una matriz aleatoria de 12x30, sumar cada fila y graficar el resultado como un <strong>grafico de barras</strong> azul con titulo, leyendas y grilla.</p>
+</div>
+<div class="spoiler-box" onclick="this.classList.toggle('open')">
+  <div class="spoiler-header"><span class="label">Ver solucion</span><span class="arrow">&#9660;</span></div>
+  <div class="spoiler-content">
+<pre><code>x = np.arange(0, 12)
+matriz = np.random.randint(0, 100, (12, 30))
+y = np.sum(matriz, axis=1)
+
+figura = plt.figure(dpi=100)
+plt.bar(x, y, color="blue", label="Suma por fila")
+plt.title("Ventas")
+plt.xlabel("Fila")
+plt.ylabel("Suma")
+plt.legend()
+plt.grid()
+plt.show()</code><button class="copy-btn" onclick="copyCode(this); event.stopPropagation()">Copiar</button></pre>
+  </div>
+</div>
+
+<!-- EJ 3.8 -->
+<div class="exercise">
+  <h4>Ejercicio 3.8 &mdash; Comparar matrices en un grafico <span class="difficulty medium">Medio</span></h4>
+  <p>Tomar la matriz original y la normalizada del ejercicio 3.4. Aplanarlas y graficar ambas en un mismo plot con 180 dpi. La original en linea continua roja y la normalizada en guiones azul. Incluir titulo, labels, leyendas y grilla.</p>
+</div>
+<div class="spoiler-box" onclick="this.classList.toggle('open')">
+  <div class="spoiler-header"><span class="label">Ver solucion</span><span class="arrow">&#9660;</span></div>
+  <div class="spoiler-content">
+<pre><code>x = np.arange(1, matriz_normal.flatten().size + 1)
+
+figura = plt.figure(dpi=180)
+plt.plot(x, matriz_normal.flatten(), linestyle="-", color="red", label="Original")
+plt.plot(x, matriz_normalizada.flatten(), linestyle="--", color="blue", label="Normalizada")
+plt.title("Matriz / Matriz normalizada")
+plt.xlabel("Posicion")
+plt.ylabel("Valor")
+plt.legend()
+plt.grid()
+plt.show()</code><button class="copy-btn" onclick="copyCode(this); event.stopPropagation()">Copiar</button></pre>
+  </div>
+</div>
+
+
+<!-- ═══════════ EJERCICIOS SEMANA 4 ═══════════ -->
+<h2 id="ej-s4">Ejercicios Semana 4 &mdash; Pandas y Regex</h2>
+
+<!-- EJ 4.1 -->
+<div class="exercise">
+  <h4>Ejercicio 4.1 &mdash; Cargar y explorar un dataset <span class="difficulty easy">Facil</span></h4>
+  <p>Descargar un dataset de Kaggle, cargarlo con <code>pd.read_csv()</code> y mostrar:</p>
+  <ul>
+    <li>Cantidad de filas y columnas</li>
+    <li>Cantidad de celdas (<code>.size</code>)</li>
+    <li>Nombre de las columnas</li>
+    <li>Primeras 10 filas y ultimas 15</li>
+  </ul>
+</div>
+<div class="spoiler-box" onclick="this.classList.toggle('open')">
+  <div class="spoiler-header"><span class="label">Ver solucion</span><span class="arrow">&#9660;</span></div>
+  <div class="spoiler-content">
+<pre><code>from pandas import read_csv
+
+df = read_csv("df_total.csv")
+
+print("Filas:", df.shape[0])
+print("Columnas:", df.shape[1])
+print("Celdas:", df.size)
+print("Columnas:\n-", "\n- ".join(df.columns))
+
+df.head(10)
+df.tail(15)</code><button class="copy-btn" onclick="copyCode(this); event.stopPropagation()">Copiar</button></pre>
+  </div>
+</div>
+
+<!-- EJ 4.2 -->
+<div class="exercise">
+  <h4>Ejercicio 4.2 &mdash; Cargar CSV con separador problematico <span class="difficulty hard">Dificil</span></h4>
+  <p>Cargar un CSV que tiene un <strong>separador no estandar</strong> (ej: <code>|</code>). El archivo puede tener caracteres problematicos que rompen la lectura. Encontrar la forma de limpiarlo y cargarlo.</p>
+  <p><em>Pista: usa <code>read_csv(file, delimiter="|")</code> y si falla, lee el archivo como texto, limpialo con <code>re.sub()</code> y volvelo a cargar.</em></p>
+</div>
+<div class="spoiler-box" onclick="this.classList.toggle('open')">
+  <div class="spoiler-header"><span class="label">Ver solucion</span><span class="arrow">&#9660;</span></div>
+  <div class="spoiler-content">
+<pre><code>import re
+from pandas import read_csv
+
+file = "reviews_filmaffinity.csv"
+
+# Leer como texto y limpiar caracteres problematicos
+with open(file) as r:
+    text = r.read()
+
+# Reemplazar caracteres problematicos si es necesario
+# text = re.sub(r'patron_problematico', 'reemplazo', text)
+
+# Guardar version limpia
+with open(file.replace(".csv", "_clean.csv"), "w") as w:
+    w.write(text)
+
+# Cargar con separador pipe
+df = read_csv(file, delimiter="|")
+print("Filas:", df.shape[0])
+print("Columnas:", df.shape[1])
+df.head(10)</code><button class="copy-btn" onclick="copyCode(this); event.stopPropagation()">Copiar</button></pre>
+  </div>
+</div>
+
+<!-- EJ 4.3 -->
+<div class="exercise">
+  <h4>Ejercicio 4.3 &mdash; Groupby y graficos de barras <span class="difficulty medium">Medio</span></h4>
+  <p>Dado un DataFrame con columnas <code>film_name</code>, <code>gender</code>, <code>review_rate</code>, etc.:</p>
+  <ol>
+    <li>Calcular el total de criticas por <strong>pelicula</strong> (groupby + count) y graficarlo en barras</li>
+    <li>Calcular el total de criticas por <strong>genero</strong> y graficarlo en barras</li>
+  </ol>
+</div>
+<div class="spoiler-box" onclick="this.classList.toggle('open')">
+  <div class="spoiler-header"><span class="label">Ver solucion</span><span class="arrow">&#9660;</span></div>
+  <div class="spoiler-content">
+<pre><code># Por pelicula
+df_film = df.groupby("film_name").count()
+df_film.rename(columns={"review_rate": "count"}, inplace=True)
+df_film.drop(["gender", "film_avg_rate", "review_title", "review_text"],
+             axis=1, inplace=True)
+df_film.plot.bar(title="Cantidad por pelicula")
+
+# Por genero
+df_gender = df.groupby("gender").count()
+df_gender.rename(columns={"review_rate": "count"}, inplace=True)
+df_gender.drop(["film_name", "film_avg_rate", "review_title", "review_text"],
+               axis=1, inplace=True)
+df_gender.plot.bar(title="Cantidad por genero")</code><button class="copy-btn" onclick="copyCode(this); event.stopPropagation()">Copiar</button></pre>
+  </div>
+</div>
+
+<!-- EJ 4.4 -->
+<div class="exercise">
+  <h4>Ejercicio 4.4 &mdash; Filtrar agrupaciones <span class="difficulty easy">Facil</span></h4>
+  <p>Tomar los DataFrames agrupados del ejercicio anterior y filtrar solo los que tienen <strong>mas de 400 reviews</strong>. Graficarlos.</p>
+</div>
+<div class="spoiler-box" onclick="this.classList.toggle('open')">
+  <div class="spoiler-header"><span class="label">Ver solucion</span><span class="arrow">&#9660;</span></div>
+  <div class="spoiler-content">
+<pre><code>df_film[df_film["count"] > 400].plot.bar(title="Peliculas con +400 reviews")
+df_gender[df_gender["count"] > 400].plot.bar(title="Generos con +400 reviews")</code><button class="copy-btn" onclick="copyCode(this); event.stopPropagation()">Copiar</button></pre>
+  </div>
+</div>
+
+<!-- EJ 4.5 -->
+<div class="exercise">
+  <h4>Ejercicio 4.5 &mdash; Contar puntuacion con regex <span class="difficulty hard">Dificil</span></h4>
+  <p>Tomar un DataFrame con columnas <code>film_name</code> y <code>review_text</code>. Para cada pelicula, contar la cantidad total de <strong>signos de puntuacion</strong> (puntos, comas, punto y coma) en todas sus reviews. Usar <strong>expresiones regulares</strong> y mostrar resultado en tabla con <code>tabulate</code>.</p>
+</div>
+<div class="spoiler-box" onclick="this.classList.toggle('open')">
+  <div class="spoiler-header"><span class="label">Ver solucion</span><span class="arrow">&#9660;</span></div>
+  <div class="spoiler-content">
+<pre><code>import re
+from tabulate import tabulate
+
+df_copy = df.copy()
+df_copy.drop(columns=["review_rate", "film_avg_rate", "review_title", "gender"],
+             inplace=True)
+
+reviews = {}
+for _, row in df_copy.iterrows():
+    film = row["film_name"]
+    text = str(row["review_text"])
+    puntuacion = len(re.findall(r"[.,;]", text))
+
+    if film not in reviews:
+        reviews[film] = 0
+    reviews[film] += puntuacion
+
+tabla = [[k, v] for k, v in reviews.items()]
+print(tabulate(tabla, headers=["film_name", "punctuation"]))</code><button class="copy-btn" onclick="copyCode(this); event.stopPropagation()">Copiar</button></pre>
+  </div>
+</div>
+
+<!-- EJ 4.6 -->
+<div class="exercise">
+  <h4>Ejercicio 4.6 &mdash; Buscar fechas con regex <span class="difficulty hard">Dificil</span></h4>
+  <p>Dado un diccionario de reviews por pelicula, buscar si hay <strong>fechas</strong> (formato <code>dd/mm/yyyy</code>) en los textos de las reviews. Mostrar el nombre de la pelicula, la posicion de la review y el texto.</p>
+  <p><em>Pista: patron <code>r"(0[1-9]|[12]\d|3[01]|\d)\/(0[1-9]|1[0-2]|\d)\/(\d{4}|\d{2})"</code></em></p>
+</div>
+<div class="spoiler-box" onclick="this.classList.toggle('open')">
+  <div class="spoiler-header"><span class="label">Ver solucion</span><span class="arrow">&#9660;</span></div>
+  <div class="spoiler-content">
+<pre><code>import re
+
+patron = r"(0[1-9]|[12]\d|3[01]|\d)\/(0[1-9]|1[0-2]|\d)\/(\d{4}|\d{2})"
+
+for nombre, lista_reviews in reviews.items():
+    for review in lista_reviews:
+        if re.findall(patron, review["review_text"]):
+            print(f"Pelicula: {nombre}")
+            print(f"Posicion: {review['position']}")
+            print(f"Review: {review['review_text']}")
+            print()</code><button class="copy-btn" onclick="copyCode(this); event.stopPropagation()">Copiar</button></pre>
+  </div>
+</div>
+
+
+<!-- ╔═══════════════════════════════════════════╗ -->
 <!-- ║            REFERENCIAS RAPIDAS            ║ -->
 <!-- ╚═══════════════════════════════════════════╝ -->
 <div class="separator"></div>
@@ -1814,6 +2789,11 @@ function filterNav(query) {
 window.addEventListener('scroll', () => {
   const btn = document.querySelector('.scroll-top');
   btn.style.display = window.scrollY > 400 ? 'block' : 'none';
+});
+
+// Spoiler boxes - prevent code copy clicks from toggling
+document.querySelectorAll('.spoiler-box .copy-btn').forEach(btn => {
+  btn.addEventListener('click', e => e.stopPropagation());
 });
 
 // Smooth scroll
